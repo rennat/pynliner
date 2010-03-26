@@ -6,9 +6,10 @@ Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and css
 
 """
 
+import urllib2
+import cssutils
 from BeautifulSoup import BeautifulSoup
 from soupselect import select
-import cssutils
 
 class Pynliner(object):
     """Pynliner class"""
@@ -22,8 +23,8 @@ class Pynliner(object):
         """Gets remote HTML page for conversion
         
         Downloads HTML page from `url` as a string and passes it to the
-        `from_string` method. Also sets `self.root_url` to be appended to all
-        <link> tags urls when importing them.
+        `from_string` method. Also sets `self.root_url` and `self.relative_url`
+        for use in importing <link> elements.
         
         Returns self.
         
@@ -31,8 +32,11 @@ class Pynliner(object):
         >>> p.from_url('http://somewebsite.com/file.html')
         <Pynliner object at 0x26ac70>
         """
-        # TODO: implement url downloader
-        pass
+        self.url = url
+        self.relative_url = '/'.join(url.split('/')[:-1]) + '/'
+        self.root_url = '/'.join(url.split('/')[:3])
+        self.source_string = self._get_url(self.url)
+        return self
     
     def from_string(self, string):
         """Generates a Pynliner object from the given HTML string.
@@ -80,6 +84,11 @@ class Pynliner(object):
         self._apply_styles()
         return self._get_output()
     
+    def _get_url(self, url):
+        """Returns the response content from the given url
+        """
+        return urllib2.urlopen(url).read()
+    
     def _get_soup(self):
         """Convert source string to BeautifulSoup object. Sets it to self.soup.
         """
@@ -91,18 +100,42 @@ class Pynliner(object):
         cssutils and the resulting CSSStyleSheet object set to
         `self.stylesheet`.
         """
-        # TODO: get the link tags and import them
-        
-        style_tags = self.soup.findAll('style')
-        
+        self._get_external_styles()
+        self._get_internal_styles()
+        self.stylesheet = cssutils.parseString(self.style_string)
+    
+    def _get_external_styles(self):
+        """Gets <link> element styles
+        """
         if not self.style_string:
             self.style_string = u''
+        else:
+            self.style_string += u'\n'
         
+        link_tags = self.soup.findAll('link', {'rel': 'stylesheet'})
+        for tag in link_tags:
+            url = tag['href']
+            if url.startswith('http://'):
+                pass
+            elif url.startswith('/'):
+                url = self.root_url + url
+            else:
+                url = self.relative_url + url
+            self.style_string += self._get_url(url)
+            tag.extract()
+    
+    def _get_internal_styles(self):
+        """Gets <style> element styles
+        """
+        if not self.style_string:
+            self.style_string = u''
+        else:
+            self.style_string += u'\n'
+        
+        style_tags = self.soup.findAll('style')
         for tag in style_tags:
             self.style_string += u'\n'.join(tag.contents) + u'\n'
             tag.extract()
-        
-        self.stylesheet = cssutils.parseString(self.style_string)
     
     def _apply_styles(self):
         """Steps through CSS rules and applies each to all the proper elements

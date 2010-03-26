@@ -53,6 +53,39 @@ class Basic(unittest.TestCase):
         desired = u'<h1 style="color: #fc0">Hello World!</h1>'
         self.assertEqual(output, desired)
     
+    def test_08_fromURL(self):
+        """Test 'fromURL' constructor"""
+        url = 'http://media.tannern.com/pynliner/test.html'
+        p = Pynliner()
+        p.from_url(url)
+        self.assertEqual(p.root_url, 'http://media.tannern.com')
+        self.assertEqual(p.relative_url, 'http://media.tannern.com/pynliner/')
+        
+        p._get_soup()
+        
+        p._get_external_styles()
+        self.assertEqual(p.style_string, "p {color: #999}")
+        
+        p._get_internal_styles()
+        self.assertEqual(p.style_string, "p {color: #999}\nh1 {color: #ffcc00;}\n")
+        
+        p._get_styles()
+        
+        output = p.run()
+        desired = u"""<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>test</title>
+
+
+</head>
+<body>
+<h1 style="color: #fc0">Hello World!</h1>
+<p style="color: #999">Possim tincidunt putamus iriure eu nulla. Facer qui volutpat ut aliquam sequitur. Mutationem legere feugiat autem clari notare. Nulla typi augue suscipit lectores in.</p>
+<p style="color: #999">Facilisis claritatem eum decima dignissim legentis. Nulla per legentis odio molestie quarta. Et velit typi claritas ipsum ullamcorper.</p>
+</body>
+</html>"""
+        self.assertEqual(output, desired) 
 
 class Extended(unittest.TestCase):
     
