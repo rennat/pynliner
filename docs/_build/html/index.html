@@ -5,13 +5,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pynliner &mdash; pynliner v0.1.2 documentation</title>
+    <title>pynliner &mdash; pynliner v0.2.0 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '#',
-        VERSION:     '0.1.2',
+        VERSION:     '0.2.0',
         COLLAPSE_MODINDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -19,7 +19,7 @@
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pynliner v0.1.2 documentation" href="#" /> 
+    <link rel="top" title="pynliner v0.2.0 documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="modindex.html" title="Global Module Index"
              accesskey="M">modules</a> |</li>
-        <li><a href="#">pynliner v0.1.2 documentation</a> &raquo;</li> 
+        <li><a href="#">pynliner v0.2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -105,8 +105,8 @@
 <tt class="descclassname">Pynliner.</tt><tt class="descname">from_url</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#pynliner.Pynliner.from_url" title="Permalink to this definition">¶</a></dt>
 <dd><p>Gets remote HTML page for conversion</p>
 <p>Downloads HTML page from <cite>url</cite> as a string and passes it to the
-<cite>from_string</cite> method. Also sets <cite>self.root_url</cite> to be appended to all
-&lt;link&gt; tags urls when importing them.</p>
+<cite>from_string</cite> method. Also sets <cite>self.root_url</cite> and <cite>self.relative_url</cite>
+for use in importing &lt;link&gt; elements.</p>
 <p>Returns self.</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pynliner</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">from_url</span><span class="p">(</span><span class="s">&#39;http://somewebsite.com/file.html&#39;</span><span class="p">)</span>
@@ -210,7 +210,7 @@ performed.</p>
         <li class="right" >
           <a href="modindex.html" title="Global Module Index"
              >modules</a> |</li>
-        <li><a href="#">pynliner v0.1.2 documentation</a> &raquo;</li> 
+        <li><a href="#">pynliner v0.2.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">

@@ -1,6 +1,6 @@
 # Sphinx inventory version 1
 # Project: pynliner
-# Version: 0.1
+# Version: 0.2
 pynliner mod index.html
 pynliner.Pynliner.from_url method index.html
 pynliner.fromURL function index.html
