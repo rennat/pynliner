@@ -63,8 +63,7 @@ class Pynliner(object):
         for selector in ruleDict:
             elements = select(self.soup, selector)
             for el in elements:
-                print 'applying style "%s" to %s' % (el['style'] + u'; ' + ruleDict[selector], selector)
-                if 'style' in el:
+                if el.has_key('style'):
                     el['style'] += u'; ' + ruleDict[selector]
                 else:
                     el['style'] = ruleDict[selector]
