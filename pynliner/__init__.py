@@ -6,9 +6,6 @@ Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and css
 
 """
 
-__author__ = 'Tanner Netterville'
-__version__ = '0.1.1'
-
 from BeautifulSoup import BeautifulSoup
 from soupselect import select
 import cssutils
