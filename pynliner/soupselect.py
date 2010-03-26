@@ -7,10 +7,10 @@ CSS selector support for BeautifulSoup.
 
 soup = BeautifulSoup('<html>...')
 select(soup, 'div')
-- returns a list of div elements
+    - returns a list of div elements
 
 select(soup, 'div#main ul a')
-- returns a list of links inside a ul inside div#main
+    - returns a list of links inside a ul inside div#main
 
 """
 
