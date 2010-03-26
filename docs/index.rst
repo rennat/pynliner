@@ -4,7 +4,27 @@ pynliner
 
 .. automodule :: pynliner
 
-example
+Project pages
+-------------
+
+- PyPI package page: http://pypi.python.org/pypi/pynliner
+- github project page: http://github.com/rennat/pynliner
+- this documentation: http://packages.python.org/pynliner
+
+installation
+------------
+
+::
+
+    $ easy_install pynliner
+
+or
+
+::
+
+    $ pip install pynliner
+
+example 
 -------
 
 >>> html = u'<style>h1 { color:#ffcc00; }</style><h1>Hello World!</h1>'
