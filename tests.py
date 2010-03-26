@@ -3,7 +3,7 @@
 import unittest
 import pynliner
 
-class Test_01_Basic(unittest.TestCase):
+class Basic(unittest.TestCase):
     
     def setUp(self):
         self.html = "<style>h1 { color:#ffcc00; }</style><h1>Hello World!</h1>"
@@ -47,14 +47,16 @@ class Test_01_Basic(unittest.TestCase):
         self.assertEqual(output, u'<h1 style="font-size: 2em; color: #fc0">Hello World!</h1>')
     
 
-class Test_02_Extended(unittest.TestCase):
+class Extended(unittest.TestCase):
     
     def test_overwrite(self):
         """Test overwrite inline styles"""
         html = '<style>h1 {color: #000;}</style><h1 style="color: #fff">Foo</h1>'
-        desired_output = '<h1 style="color: #fff; color: #000">Foo</h1>'
+        desired_output = '<h1 style="color: #000; color: #fff">Foo</h1>'
         output = pynliner.fromString(html).run()
         self.assertEqual(output, desired_output)
+    
+    def test_
 
 
 if __name__ == '__main__':

@@ -64,7 +64,7 @@ class Pynliner(object):
             elements = select(self.soup, selector)
             for el in elements:
                 if el.has_key('style'):
-                    el['style'] += u'; ' + ruleDict[selector]
+                    el['style'] = u'%s; %s' % (ruleDict[selector], el['style'])
                 else:
                     el['style'] = ruleDict[selector]
     
