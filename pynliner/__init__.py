@@ -144,11 +144,11 @@ class Pynliner(object):
         rules = self.stylesheet.cssRules.rulesOfType(1)
         ruleDict = {}
         for rule in rules:
-            s = rule.selectorText
-            if s in ruleDict:
-                ruleDict[s] += '; ' + rule.style.cssText
-            else:
-                ruleDict[s] = rule.style.cssText
+            for s in rule.selectorText.split(','):
+                if s in ruleDict:
+                    ruleDict[s] += '; ' + rule.style.cssText
+                else:
+                    ruleDict[s] = rule.style.cssText
         
         for selector in ruleDict:
             elements = select(self.soup, selector)
