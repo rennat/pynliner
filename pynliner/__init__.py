@@ -104,7 +104,12 @@ class Pynliner(object):
         """
         self._get_external_styles()
         self._get_internal_styles()
-        self.stylesheet = cssutils.parseString(self.style_string)
+
+        if hasattr(self, 'log'):
+            cssparser = cssutils.CSSParser(log=self.log)
+        else:
+            cssparser = cssutils.CSSParser()
+        self.stylesheet = cssparser.parseString(self.style_string)
     
     def _get_external_styles(self):
         """Gets <link> element styles
