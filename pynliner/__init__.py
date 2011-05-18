@@ -20,7 +20,10 @@ class Pynliner(object):
     style_string = False
     stylesheet = False
     output = False
-    
+
+    def __init__(self, log=None):
+        self.log = log
+
     def from_url(self, url):
         """Gets remote HTML page for conversion
         
@@ -104,7 +107,9 @@ class Pynliner(object):
         """
         self._get_external_styles()
         self._get_internal_styles()
-        self.stylesheet = cssutils.parseString(self.style_string)
+
+        cssparser = cssutils.CSSParser(log=self.log)
+        self.stylesheet = cssparser.parseString(self.style_string)
     
     def _get_external_styles(self):
         """Gets <link> element styles
@@ -168,21 +173,21 @@ class Pynliner(object):
         self.output = unicode(self.soup)
         return self.output
 
-def fromURL(url):
+def fromURL(url, log=None):
     """Shortcut Pynliner constructor. Equivelent to:
     
     >>> Pynliner().from_url(someURL).run()
     
     Returns processed HTML string.
     """
-    return Pynliner().from_url(url).run()
+    return Pynliner(log).from_url(url).run()
 
-def fromString(string):
+def fromString(string, log=None):
     """Shortcut Pynliner constructor. Equivelent to:
     
     >>> Pynliner().from_string(someString).run()
     
     Returns processed HTML string.
     """
-    return Pynliner().from_string(string).run()
+    return Pynliner(log).from_string(string).run()
 
