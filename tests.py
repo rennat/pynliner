@@ -159,6 +159,26 @@ class Extended(unittest.TestCase):
         output = Pynliner().from_string(html).run()
         self.assertEqual(output, desired_output)
 
-   
+import StringIO
+import logging
+class WithCustomLog(unittest.TestCase):
+    def setUp(self):
+        self.log = logging.getLogger('testlog')
+        self.log.setLevel(logging.DEBUG)
+
+        self.logstream = StringIO.StringIO()
+        handler = logging.StreamHandler(self.logstream)
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        handler.setFormatter(formatter)
+        self.log.addHandler(handler)
+
+        self.html = "<style>h1 { color:#ffcc00; }</style><h1>Hello World!</h1>"
+        self.p = Pynliner(self.log).from_string(self.html)
+
+    def test_custom_log(self):
+        self.p.run()
+        log_contents = self.logstream.getvalue()
+        assert "DEBUG" in log_contents
+
 if __name__ == '__main__':
     unittest.main()
