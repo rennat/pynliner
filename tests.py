@@ -114,12 +114,12 @@ class CommaSelector(unittest.TestCase):
         self.p._get_soup()
         self.p._get_styles()
         self.p._apply_styles()
-        self.assertEqual(unicode(self.p.soup), u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="font-weight: bold; color: red">Bold Red</span>')
+        self.assertEqual(unicode(self.p.soup), u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-weight: bold">Bold Red</span>')
 
     def test_05_run(self):
         """Test 'run' method"""
         output = self.p.run()
-        self.assertEqual(output, u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="font-weight: bold; color: red">Bold Red</span>')
+        self.assertEqual(output, u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-weight: bold">Bold Red</span>')
 
     def test_06_with_cssString(self):
         """Test 'with_cssString' method"""
@@ -128,12 +128,12 @@ class CommaSelector(unittest.TestCase):
         self.assertEqual(self.p.style_string, cssString + '\n')
 
         output = self.p.run()
-        self.assertEqual(output, u'<span class="b1" style="font-size: 2em; font-weight: bold">Bold</span><span class="b2 c" style="font-size: 2em; font-weight: bold; color: red">Bold Red</span>')
+        self.assertEqual(output, u'<span class="b1" style="font-size: 2em; font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-size: 2em; font-weight: bold">Bold Red</span>')
 
     def test_07_fromString(self):
         """Test 'fromString' complete"""
         output = pynliner.fromString(self.html)
-        desired = u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="font-weight: bold; color: red">Bold Red</span>'
+        desired = u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-weight: bold">Bold Red</span>'
         self.assertEqual(output, desired)
 
     def test_08_comma_whitespace(self):

@@ -169,7 +169,12 @@ class Pynliner(object):
 
         # build up a property list for every styled element
         for rule in rules:
-            elements = select(self.soup, rule.selectorText)
+            # select elements for every selector
+            selectors = rule.selectorText.split(',')
+            elements = []
+            for selector in selectors:
+                elements += select(self.soup, selector)
+            # build prop_list for each selected element
             for elem in elements:
                 if elem not in elem_prop_map:
                     elem_prop_map[elem] = []
