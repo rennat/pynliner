@@ -144,7 +144,7 @@ class Pynliner(object):
             self.style_string += u'\n'.join(tag.contents) + u'\n'
             tag.extract()
 
-   def _get_specificity_from_list(self, lst):
+    def _get_specificity_from_list(self, lst):
         """
         Takes an array of ints and returns an integer formed
         by adding all ints multiplied by the power of 10 of the current index
@@ -192,9 +192,9 @@ class Pynliner(object):
         # apply rules to elements
         for elem, style_declaration in elem_style_map.items():
             if elem.has_key('style'):
-                elem['style'] = u'%s; %s' % (style_declaration.cssText, elem['style'])
+                elem['style'] = u'%s; %s' % (style_declaration.cssText.replace('\n', ' '), elem['style'])
             else:
-                elem['style'] = style_declaration.cssText
+                elem['style'] = style_declaration.cssText.replace('\n', ' ')
     def _get_output(self):
         """Generate Unicode string of `self.soup` and set it to `self.output`
 
