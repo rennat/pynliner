@@ -47,6 +47,7 @@ class Basic(unittest.TestCase):
         output = self.p.run()
         self.assertEqual(output, u'<h1 style="font-size: 2em; color: #fc0">Hello World!</h1>')
 
+
     def test_07_fromString(self):
         """Test 'fromString' complete"""
         output = pynliner.fromString(self.html)
@@ -86,6 +87,13 @@ class Basic(unittest.TestCase):
 </body>
 </html>"""
         self.assertEqual(output, desired)
+
+    def test_09_overloadedStyles(self):
+        html = '<style>h1 { color: red; } #test { color: blue; }</style><h1 id="test">Hello world!</h1>'
+        expected = '<h1 id="test" style="color: blue">Hello world!</h1>'
+        output = Pynliner().from_string(html).run()
+        self.assertEqual(expected, output)
+
 
 class CommaSelector(unittest.TestCase):
 

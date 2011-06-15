@@ -194,12 +194,14 @@ class Pynliner(object):
                 for prop in prop_list:
                     elem_style_map[elem][prop.name] = prop.value
 
+
         # apply rules to elements
         for elem, style_declaration in elem_style_map.items():
             if elem.has_key('style'):
                 elem['style'] = u'%s; %s' % (style_declaration.cssText.replace('\n', ' '), elem['style'])
             else:
                 elem['style'] = style_declaration.cssText.replace('\n', ' ')
+
     def _get_output(self):
         """Generate Unicode string of `self.soup` and set it to `self.output`
 
