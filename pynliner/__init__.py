@@ -13,6 +13,9 @@ import cssutils
 from BeautifulSoup import BeautifulSoup
 from soupselect import select
 
+# turn off annoying warnings
+cssutils.log.enabled = False
+
 class Pynliner(object):
     """Pynliner class"""
 
