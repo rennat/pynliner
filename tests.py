@@ -195,5 +195,18 @@ class LogOptions(unittest.TestCase):
         log_contents = self.logstream.getvalue()
         self.assertIn("DEBUG", log_contents)
 
+class BeautifulSoupBugs(unittest.TestCase):
+
+    def test_double_doctype(self):
+        self.html = """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">"""
+        output = pynliner.fromString(self.html)
+        self.assertNotIn("<!<!", output)
+
+    def test_double_comment(self):
+        self.html = """<!-- comment -->"""
+        output = pynliner.fromString(self.html)
+        self.assertNotIn("<!--<!--", output)
+
 if __name__ == '__main__':
     unittest.main()
