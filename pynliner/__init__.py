@@ -22,10 +22,8 @@ class Pynliner(object):
     output = False
 
     def __init__(self, log=None):
-        if not log:
-            cssutils.log.enabled = False
-        else:
-            self.log = log
+        self.log = log
+        cssutils.log.enabled = False if log is None else True
 
     def from_url(self, url):
         """Gets remote HTML page for conversion
