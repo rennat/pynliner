@@ -12,6 +12,8 @@ select(soup, 'div')
 select(soup, 'div#main ul a')
     - returns a list of links inside a ul inside div#main
 
+patched to support multiple class selectors here http://code.google.com/p/soupselect/issues/detail?id=4#c0
+
 """
 
 import re
@@ -91,7 +93,7 @@ def select(soup, selector):
             for context in current_context:
                 found.extend(
                     context.findAll(tag,
-                        {'class': lambda attr: attr and klass in attr.split()}
+                        {'class': lambda attr: attr and set(klass.split('.')).issubset(attr.split())}
                     )
                 )
             current_context = found

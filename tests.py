@@ -208,5 +208,21 @@ class BeautifulSoupBugs(unittest.TestCase):
         output = pynliner.fromString(self.html)
         self.assertNotIn("<!--<!--", output)
 
+class MultipleSelectors(unittest.TestCase):
+
+    def test_multiple_classes(self):
+        html = """<h1 class="a b">Hello World!</h1>"""
+        css = """h1.a.b { color: red; }"""
+        expected = u"""<h1 class="a b" style="color: red">Hello World!</h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_combination(self):
+        html = """<h1 id="a" class="b">Hello World!</h1>"""
+        css = """h1#a.b { color: red; }"""
+        expected = u"""<h1 id="a" class="b" style="color: red">Hello World!</h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
 if __name__ == '__main__':
     unittest.main()
