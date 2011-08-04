@@ -13,9 +13,6 @@ import cssutils
 from BeautifulSoup import BeautifulSoup
 from soupselect import select
 
-# turn off annoying warnings
-cssutils.log.enabled = False
-
 class Pynliner(object):
     """Pynliner class"""
 
@@ -25,7 +22,10 @@ class Pynliner(object):
     output = False
 
     def __init__(self, log=None):
-        self.log = log
+        if not log:
+            cssutils.log.enabled = False
+        else:
+            self.log = log
 
     def from_url(self, url):
         """Gets remote HTML page for conversion
