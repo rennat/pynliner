@@ -208,19 +208,47 @@ class BeautifulSoupBugs(unittest.TestCase):
         output = pynliner.fromString(self.html)
         self.assertNotIn("<!--<!--", output)
 
-class MultipleSelectors(unittest.TestCase):
+class ComplexSelectors(unittest.TestCase):
 
-    def test_multiple_classes(self):
+    def test_multiple_class_selector(self):
         html = """<h1 class="a b">Hello World!</h1>"""
         css = """h1.a.b { color: red; }"""
         expected = u"""<h1 class="a b" style="color: red">Hello World!</h1>"""
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
-    def test_combination(self):
+    def test_combination_selector(self):
         html = """<h1 id="a" class="b">Hello World!</h1>"""
         css = """h1#a.b { color: red; }"""
         expected = u"""<h1 id="a" class="b" style="color: red">Hello World!</h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_descendant_selector(self):
+        html = """<h1><span>Hello World!</span></h1>"""
+        css = """h1 span { color: red; }"""
+        expected = u"""<h1><span style="color: red">Hello World!</span></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_selector(self):
+        html = """<h1><span>Hello World!</span></h1>"""
+        css = """h1 > span { color: red; }"""
+        expected = u"""<h1><span style="color: red">Hello World!</span></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_adjacent_selector(self):
+        html = """<h1>Hello World!</h1><h2>How are you?</h2>"""
+        css = """h1 + h2 { color: red; }"""
+        expected = u"""<h1>Hello World!</h1><h2 style="color: red">How are you?</h2>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_attribute_selector(self):
+        html = """<h1 title="foo">Hello World!</h1>"""
+        css = """h1[title="foo"] { color: red; }"""
+        expected = u"""<h1 title="foo" style="color: red">Hello World!</h1>"""
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
