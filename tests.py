@@ -2,6 +2,9 @@
 
 import unittest
 import pynliner
+import StringIO
+import logging
+import cssutils
 from pynliner import Pynliner
 
 class Basic(unittest.TestCase):
@@ -167,10 +170,16 @@ class Extended(unittest.TestCase):
         output = Pynliner().from_string(html).run()
         self.assertEqual(output, desired_output)
 
-import StringIO
-import logging
-class WithCustomLog(unittest.TestCase):
+class LogOptions(unittest.TestCase):
     def setUp(self):
+        self.html = "<style>h1 { color:#ffcc00; }</style><h1>Hello World!</h1>"
+
+    def test_no_log(self):
+        self.p = Pynliner()
+        self.assertEqual(self.p.log, None)
+        self.assertEqual(cssutils.log.enabled, False)
+
+    def test_custom_log(self):
         self.log = logging.getLogger('testlog')
         self.log.setLevel(logging.DEBUG)
 
@@ -180,13 +189,11 @@ class WithCustomLog(unittest.TestCase):
         handler.setFormatter(formatter)
         self.log.addHandler(handler)
 
-        self.html = "<style>h1 { color:#ffcc00; }</style><h1>Hello World!</h1>"
         self.p = Pynliner(self.log).from_string(self.html)
 
-    def test_custom_log(self):
         self.p.run()
         log_contents = self.logstream.getvalue()
-        assert "DEBUG" in log_contents
+        self.assertIn("DEBUG", log_contents)
 
 if __name__ == '__main__':
     unittest.main()
