@@ -6,7 +6,7 @@ Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and css
 
 """
 
-__version__ = "0.2.1"
+__version__ = "0.4.0"
 
 import urllib2
 import cssutils

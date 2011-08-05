@@ -7,13 +7,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>pynliner &mdash; pynliner v0.2.1 documentation</title>
+    <title>pynliner &mdash; pynliner v0.4.0 documentation</title>
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.2.1',
+        VERSION:     '0.4.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -22,7 +22,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="pynliner v0.2.1 documentation" href="#" /> 
+    <link rel="top" title="pynliner v0.4.0 documentation" href="#" /> 
   </head>
   <body>
     <div class="related">
@@ -31,10 +31,7 @@
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="#">pynliner v0.2.1 documentation</a> &raquo;</li> 
+        <li><a href="#">pynliner v0.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -43,10 +40,8 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="module-pynliner">
-<span id="pynliner"></span><h1>pynliner<a class="headerlink" href="#module-pynliner" title="Permalink to this headline">¶</a></h1>
-<p>Pynliner : Convert CSS to inline styles</p>
-<p>Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and cssutils</p>
+  <div class="section" id="pynliner">
+<h1>pynliner<a class="headerlink" href="#pynliner" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="project-pages">
 <h2>Project pages<a class="headerlink" href="#project-pages" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
@@ -73,91 +68,11 @@
 </div>
 <div class="section" id="functions">
 <h2>functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="pynliner.fromURL">
-<tt class="descclassname">pynliner.</tt><tt class="descname">fromURL</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#pynliner.fromURL" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shortcut Pynliner constructor. Equivelent to:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Pynliner</span><span class="p">()</span><span class="o">.</span><span class="n">from_url</span><span class="p">(</span><span class="n">someURL</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Returns processed HTML string.</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pynliner.fromString">
-<tt class="descclassname">pynliner.</tt><tt class="descname">fromString</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#pynliner.fromString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Shortcut Pynliner constructor. Equivelent to:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">Pynliner</span><span class="p">()</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">someString</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>Returns processed HTML string.</p>
-</dd></dl>
-
 </div>
 <div class="section" id="pynliner-pynliner">
 <h2>pynliner.Pynliner<a class="headerlink" href="#pynliner-pynliner" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="pynliner.Pynliner">
-<em class="property">class </em><tt class="descclassname">pynliner.</tt><tt class="descname">Pynliner</tt><a class="headerlink" href="#pynliner.Pynliner" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pynliner class</p>
-</dd></dl>
-
 <div class="section" id="methods">
 <h3>methods<a class="headerlink" href="#methods" title="Permalink to this headline">¶</a></h3>
-<dl class="method">
-<dt id="pynliner.Pynliner.from_url">
-<tt class="descclassname">Pynliner.</tt><tt class="descname">from_url</tt><big>(</big><em>url</em><big>)</big><a class="headerlink" href="#pynliner.Pynliner.from_url" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets remote HTML page for conversion</p>
-<p>Downloads HTML page from <cite>url</cite> as a string and passes it to the
-<cite>from_string</cite> method. Also sets <cite>self.root_url</cite> and <cite>self.relative_url</cite>
-for use in importing &lt;link&gt; elements.</p>
-<p>Returns self.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pynliner</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">from_url</span><span class="p">(</span><span class="s">&#39;http://somewebsite.com/file.html&#39;</span><span class="p">)</span>
-<span class="go">&lt;Pynliner object at 0x26ac70&gt;</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="pynliner.Pynliner.from_string">
-<tt class="descclassname">Pynliner.</tt><tt class="descname">from_string</tt><big>(</big><em>string</em><big>)</big><a class="headerlink" href="#pynliner.Pynliner.from_string" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generates a Pynliner object from the given HTML string.</p>
-<p>Returns self.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pynliner</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s">&#39;&lt;style&gt;h1 { color:#ffcc00; }&lt;/style&gt;&lt;h1&gt;Hello World!&lt;/h1&gt;&#39;</span><span class="p">)</span>
-<span class="go">&lt;Pynliner object at 0x26ac70&gt;</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="pynliner.Pynliner.with_cssString">
-<tt class="descclassname">Pynliner.</tt><tt class="descname">with_cssString</tt><big>(</big><em>cssString</em><big>)</big><a class="headerlink" href="#pynliner.Pynliner.with_cssString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds external CSS to the Pynliner object. Can be &#8220;chained&#8221;.</p>
-<p>Returns self.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s">&quot;&lt;h1&gt;Hello World!&lt;/h1&gt;&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">css</span> <span class="o">=</span> <span class="s">&quot;h1 { color:#ffcc00; }&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pynliner</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">html</span><span class="p">)</span><span class="o">.</span><span class="n">with_cssString</span><span class="p">(</span><span class="n">css</span><span class="p">)</span>
-<span class="go">&lt;pynliner.Pynliner object at 0x2ca810&gt;</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="method">
-<dt id="pynliner.Pynliner.run">
-<tt class="descclassname">Pynliner.</tt><tt class="descname">run</tt><big>(</big><big>)</big><a class="headerlink" href="#pynliner.Pynliner.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Applies each step of the process if they have not already been
-performed.</p>
-<p>Returns Unicode output with applied styles.</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">html</span> <span class="o">=</span> <span class="s">&quot;&lt;style&gt;h1 { color:#ffcc00; }&lt;/style&gt;&lt;h1&gt;Hello World!&lt;/h1&gt;&quot;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">Pynliner</span><span class="p">()</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">html</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-<span class="go">u&#39;&lt;h1 style=&quot;color: #fc0&quot;&gt;Hello World!&lt;/h1&gt;&#39;</span>
-</pre></div>
-</div>
-</dd></dl>
-
 </div>
 </div>
 </div>
@@ -211,10 +126,7 @@ performed.</p>
         <li class="right" style="margin-right: 10px">
           <a href="genindex.html" title="General Index"
              >index</a></li>
-        <li class="right" >
-          <a href="py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li><a href="#">pynliner v0.2.1 documentation</a> &raquo;</li> 
+        <li><a href="#">pynliner v0.4.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
