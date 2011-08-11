@@ -1,3 +1,5 @@
 .DS_Store
 *.pyc
 *.kpf
+.idea
+/docs/_build/html/*.zip
