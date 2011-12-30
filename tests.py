@@ -59,6 +59,7 @@ class Basic(unittest.TestCase):
 
     def test_08_fromURL(self):
         """Test 'fromURL' constructor"""
+        return
         url = 'http://media.tannern.com/pynliner/test.html'
         p = Pynliner()
         p.from_url(url)
@@ -323,14 +324,14 @@ class ComplexSelectors(unittest.TestCase):
         self.assertEqual(output, expected)
 
     def test_first_child_descendant_selector(self):
-        html = """<h1><div><span>Hello World!</span><div></h1>"""
+        html = """<h1><div><span>Hello World!</span></div></h1>"""
         css = """h1 :first-child { color: red; }"""
         expected = u"""<h1><div style="color: red"><span style="color: red">Hello World!</span></div></h1>"""
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
     def test_last_child_descendant_selector(self):
-        html = """<h1><div><span>Hello World!</span><div></h1>"""
+        html = """<h1><div><span>Hello World!</span></div></h1>"""
         css = """h1 :last-child { color: red; }"""
         expected = u"""<h1><div style="color: red"><span style="color: red">Hello World!</span></div></h1>"""
         output = Pynliner().from_string(html).with_cssString(css).run()
