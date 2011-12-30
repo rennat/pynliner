@@ -313,7 +313,7 @@ class ComplexSelectors(unittest.TestCase):
         self.maxDiff = None
 
         html = """<div><div><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></div></div>"""
-        css = """div > div > * { color: green; } body > div > :first-child { color: red; }"""
+        css = """div > div > * { color: green; } div > div > :first-child { color: red; }"""
         expected = u"""<div><div><span style="color: red">Hello World!</span><p style="color: green">foo</p><div class="barclass" style="color: green"><span style="color: red">baz</span>bar</div></div></div>"""
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
