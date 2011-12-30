@@ -134,9 +134,10 @@ def select(soup, selector):
                 # This is the first token: simply find all matches
                 for context in current_context:
                     context_matches = [el for el in context[0].findAll(tag, find_dict) if checker(el)]
-                    found.extend(
-                        (context_matches, [context_matches]),
-                    )
+                    for context_match in context_matches:
+                        found.append(
+                            (context_match, [context_match]),
+                        )
             elif operator == ' ':
                 # for each context in current_context, ensure there
                 # exists an element somewhere above that element that
@@ -175,7 +176,7 @@ def select(soup, selector):
                 for context in current_context:
                     context_matches = []
                     for el in context[1]:
-                        if checker(context.findPreviousSibling(tag, find_dict)) == el.previousSibling:
+                        if checker(el.findPreviousSibling(tag, find_dict)) == el.previousSibling:
                             context_matches.append(el.previousSibling)
                     if context_matches:
                         found.append(
