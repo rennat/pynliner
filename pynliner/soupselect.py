@@ -13,7 +13,6 @@ select(soup, 'div#main ul a')
     - returns a list of links inside a ul inside div#main
 
 patched to support multiple class selectors here http://code.google.com/p/soupselect/issues/detail?id=4#c0
-
 """
 import re
 
@@ -118,11 +117,10 @@ def select(soup, selector):
             if len(ids) > 1:
                 raise Exception("Only single # OK")
             #
-            # Get class
+            # Get classes
             #
             classes = re.findall('\.([a-zA-Z0-9_-]+)', token)
 
-                #found.extend([el for el in context.findAll(tag) if checker(el)])
             #
             # Search contexts for matches
             #
@@ -155,7 +153,7 @@ def select(soup, selector):
             elif operator == '~':
                 # for each context in current_context
                 # check 
-                pass
+                raise NotImplementedError("~ operator is not implemented. Sad face :(")
             elif operator == '+':
                 # for each context in current_context
                 # check if the preceding sibling satisfies the
@@ -174,62 +172,6 @@ def select(soup, selector):
             else:
                 operator = ' '
             selector = selector.rsplit(operator, 1)[0].rstrip()
-    """
-    token = ''
-    tokens = selector.split(' >')
-    for token in tokens:
-        m = attribselect_re.match(token)
-        if m:
-            # Attribute selector
-            tag, attribute, operator, value = m.groups()
-            print tag, attribute, operator, value
-            if not tag:
-                tag = True
-            checker = attribute_checker(operator, attribute, value)
-            found = []
-            for context in current_context:
-                found.extend([el for el in context.findAll(tag) if checker(el)])
-            current_context = found
-            continue
-        if '#' in token:
-            # ID selector
-            tag, id = token.split('#', 1)
-            if not tag:
-                tag = True
-            el = current_context[0].find(tag, {'id': id})
-            if not el:
-                return [] # No match
-            current_context = [el]
-            continue
-        if '.' in token:
-            # Class selector
-            tag, klass = token.split('.', 1)
-            if not tag:
-                tag = True
-            found = []
-            for context in current_context:
-                found.extend(
-                    context.findAll(tag,
-                        {'class': lambda attr: attr and set(klass.split('.')).issubset(attr.split())}
-                    )
-                )
-            current_context = found
-            continue
-        if token == '*':
-            # Star selector
-            found = []
-            for context in current_context:
-                found.extend(context.findAll(True))
-            current_context = found
-            continue
-        # Here we should just have a regular tag
-        if not tag_re.match(token):
-            return []
-        found = []
-        for context in current_context:
-            found.extend(context.findAll(token))
-        current_context = found
-    """
     return current_context
 
 def monkeypatch(BeautifulSoupClass=None):
