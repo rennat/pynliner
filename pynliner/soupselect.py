@@ -15,23 +15,9 @@ select(soup, 'div#main ul a')
 patched to support multiple class selectors here http://code.google.com/p/soupselect/issues/detail?id=4#c0
 
 """
-
 import re
 
-tag_re = re.compile('^[a-z0-9]+$')
-
-attribselect_re = re.compile(
-    r'^(?P<tag>\w+)?\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)' + 
-    r'=?"?(?P<value>[^\]"]*)"?\]$'
-)
-
-# /^(\w+)\[(\w+)([=~\|\^\$\*]?)=?"?([^\]"]*)"?\]$/
-#   \---/  \---/\-------------/    \-------/
-#     |      |         |               |
-#     |      |         |           The value
-#     |      |    ~,|,^,$,* or =
-#     |   Attribute 
-#    Tag
+attribute_regex = re.compile('\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
 
 def attribute_checker(operator, attribute, value=''):
     """
@@ -66,13 +52,19 @@ def select(soup, selector):
         if handle_token:
             # Get the rightmost token
             handle_token = False
-            match = re.search('([0-9a-zA-Z#.:]+)$', selector)
+            match = re.search('([0-9a-zA-Z#.:*"\'\[\\]=]+)$', selector)
             if not match:
                 raise Exception("No match was found. We're done or something is broken")
             token = match.groups(1)[0]
 
             # remove this token from the selector
             selector = selector.rsplit(token, 1)[0].rstrip()
+
+            #
+            # Get attribute selectors from token
+            #
+            attribute_checkers = []
+            import pdb; pdb.set_trace();
 
             #
             # Get tag
@@ -138,7 +130,7 @@ def select(soup, selector):
                         found.append(context)
             current_context = found
         else:
-            # Handle operator (whitespace, >, ~, +)
+            # Get the next operator (whitespace, >, ~, +)
             handle_token = True
             operator = None
             match = re.search('([>~+]+)$', selector)
