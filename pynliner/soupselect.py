@@ -18,8 +18,12 @@ patched to support multiple class selectors here http://code.google.com/p/soupse
 import re
 
 attribute_regex = re.compile('\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
+pseudo_classes_regexes = (
+    re.compile(':(first-child)'),
+    re.compile(':(last-child)')
+)
 
-def attribute_checker(operator, attribute, value=''):
+def get_attribute_checker(operator, attribute, value=''):
     """
     Takes an operator, attribute and optional value; returns a function that
     will return True for elements that match that combination.
@@ -39,6 +43,25 @@ def attribute_checker(operator, attribute, value=''):
             or el.get(attribute, '').startswith('%s-' % value),
     }.get(operator, lambda el: el.has_key(attribute))
 
+def get_pseudo_class_checker(psuedo_class):
+    """
+    Takes a psuedo_class, like "first-child" or "last-child"
+    and returns a function that will check if the element satisfies
+    that psuedo class
+    """
+    return {
+        'first-child': lambda el: el.previousSibling is None,
+        'last-child': lambda el: el.nextSibling is None
+    }.get(psuedo_class)
+
+def get_checker(functions):
+    def checker(el):
+        for func in functions:
+            if not func(el):
+                return False
+        return el
+    return checker
+
 
 def select(soup, selector):
     """
@@ -52,20 +75,31 @@ def select(soup, selector):
         if handle_token:
             # Get the rightmost token
             handle_token = False
-            match = re.search('([0-9a-zA-Z#.:*"\'\[\\]=]+)$', selector)
+            match = re.search('([0-9a-zA-Z-#.:*"\'\[\\]=]+)$', selector)
             if not match:
                 raise Exception("No match was found. We're done or something is broken")
             token = match.groups(1)[0]
 
             # remove this token from the selector
             selector = selector.rsplit(token, 1)[0].rstrip()
-
+            
+            checker_functions = []
             #
             # Get attribute selectors from token
             #
-            attribute_checkers = []
-            import pdb; pdb.set_trace();
+            matches = attribute_regex.findall(token)
+            for match in matches:
+                checker_functions.append(get_attribute_checker(match[1], match[0], match[2]))
 
+            #
+            # Get pseudo classes from token
+            #
+            for pseudo_class_regex in pseudo_classes_regexes:
+                match = pseudo_class_regex.search(token)
+                if match:
+                    checker_functions.append(get_pseudo_class_checker(match.groups(1)[0]))
+            
+            checker = get_checker(checker_functions)
             #
             # Get tag
             #
@@ -88,6 +122,7 @@ def select(soup, selector):
             #
             classes = re.findall('\.([a-zA-Z0-9_-]+)', token)
 
+                #found.extend([el for el in context.findAll(tag) if checker(el)])
             #
             # Search contexts for matches
             #
@@ -100,7 +135,7 @@ def select(soup, selector):
             if operator is None:
                 for context in current_context:
                     found.extend(
-                        context.findAll(tag, find_dict)
+                        [el for el in context.findAll(tag, find_dict) if checker(el)]
                     )
             elif operator == ' ':
                 # for each context in current_context, ensure there
@@ -108,14 +143,14 @@ def select(soup, selector):
                 # matches the provided token
                 # ("descendant" selector)
                 for context in current_context:
-                    if context.findParent(tag, find_dict):
+                    if checker(context.findParent(tag, find_dict)):
                         found.append(context)
             elif operator == '>':
                 # for each context in current_context,
                 # check if the parent satisfies the provided
                 # arguments.
                 for context in current_context:
-                    if context.findParent(tag, find_dict) == context.parent:
+                    if checker(context.findParent(tag, find_dict)) == context.parent:
                         found.append(context)
             elif operator == '~':
                 # for each context in current_context
@@ -126,7 +161,7 @@ def select(soup, selector):
                 # check if the preceding sibling satisfies the
                 # provided arguments
                 for context in current_context:
-                    if context.findPreviousSibling(tag, find_dict) == context.previousSibling:
+                    if checker(context.findPreviousSibling(tag, find_dict)) == context.previousSibling:
                         found.append(context)
             current_context = found
         else:
