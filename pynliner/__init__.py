@@ -237,4 +237,3 @@ def fromString(string, log=None):
     Returns processed HTML string.
     """
     return Pynliner(log).from_string(string).run()
-
