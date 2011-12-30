@@ -59,13 +59,103 @@ def select(soup, selector):
     soup should be a BeautifulSoup instance; selector is a CSS selector 
     specifying the elements you want to retrieve.
     """
-    tokens = selector.split()
+    handle_token = True
     current_context = [soup]
+    operator = None
+    while selector:
+        if handle_token:
+            # Get the rightmost token
+            handle_token = False
+            match = re.search('([0-9a-zA-Z#.:]+)$', selector)
+            if not match:
+                raise Exception("No match was found. We're done or something is broken")
+            token = match.groups(1)[0]
+
+            # remove this token from the selector
+            selector = selector.rsplit(token, 1)[0].rstrip()
+
+            #
+            # Get tag
+            #
+            tag = re.findall('^([a-zA-Z0-9]+)', token)
+            if len(tag) == 0:
+                tag = True
+            elif len(tag) == 1:
+                tag = tag[0]
+            else:
+                raise Exception("Multiple tags found (invalid CSS)")
+
+            #
+            # Get ID
+            #
+            ids = re.findall('#([a-zA-Z0-9_-]+)', token)
+            if len(ids) > 1:
+                raise Exception("Only single # OK")
+            #
+            # Get class
+            #
+            classes = re.findall('\.([a-zA-Z0-9_-]+)', token)
+
+            #
+            # Search contexts for matches
+            #
+            found = []
+            find_dict = {}
+            if ids:
+                find_dict['id'] = ids
+            if classes:
+                find_dict['class'] = lambda attr: attr and set(classes).issubset(attr.split())
+            if operator is None:
+                for context in current_context:
+                    found.extend(
+                        context.findAll(tag, find_dict)
+                    )
+            elif operator == ' ':
+                # for each context in current_context, ensure there
+                # exists an element somewhere above that element that
+                # matches the provided token
+                # ("descendant" selector)
+                for context in current_context:
+                    if context.findParent(tag, find_dict):
+                        found.append(context)
+            elif operator == '>':
+                # for each context in current_context,
+                # check if the parent satisfies the provided
+                # arguments.
+                for context in current_context:
+                    if context.findParent(tag, find_dict) == context.parent:
+                        found.append(context)
+            elif operator == '~':
+                # for each context in current_context
+                # check 
+                pass
+            elif operator == '+':
+                # for each context in current_context
+                # check if the preceding sibling satisfies the
+                # provided arguments
+                for context in current_context:
+                    if context.findPreviousSibling(tag, find_dict) == context.previousSibling:
+                        found.append(context)
+            current_context = found
+        else:
+            # Handle operator (whitespace, >, ~, +)
+            handle_token = True
+            operator = None
+            match = re.search('([>~+]+)$', selector)
+            if match:
+                operator = match.groups(1)[0]
+            else:
+                operator = ' '
+            selector = selector.rsplit(operator, 1)[0].rstrip()
+    """
+    token = ''
+    tokens = selector.split(' >')
     for token in tokens:
         m = attribselect_re.match(token)
         if m:
             # Attribute selector
             tag, attribute, operator, value = m.groups()
+            print tag, attribute, operator, value
             if not tag:
                 tag = True
             checker = attribute_checker(operator, attribute, value)
@@ -112,6 +202,7 @@ def select(soup, selector):
         for context in current_context:
             found.extend(context.findAll(token))
         current_context = found
+    """
     return current_context
 
 def monkeypatch(BeautifulSoupClass=None):
