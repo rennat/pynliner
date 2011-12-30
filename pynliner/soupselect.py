@@ -68,7 +68,7 @@ def select(soup, selector):
     specifying the elements you want to retrieve.
     """
     handle_token = True
-    current_context = [soup]
+    current_context = [(soup, [])]
     operator = None
     while selector:
         if handle_token:
@@ -131,9 +131,11 @@ def select(soup, selector):
             if classes:
                 find_dict['class'] = lambda attr: attr and set(classes).issubset(attr.split())
             if operator is None:
+                # This is the first token: simply find all matches
                 for context in current_context:
+                    context_matches = [el for el in context[0].findAll(tag, find_dict) if checker(el)]
                     found.extend(
-                        [el for el in context.findAll(tag, find_dict) if checker(el)]
+                        (context_matches, [context_matches]),
                     )
             elif operator == ' ':
                 # for each context in current_context, ensure there
@@ -141,15 +143,27 @@ def select(soup, selector):
                 # matches the provided token
                 # ("descendant" selector)
                 for context in current_context:
-                    if checker(context.findParent(tag, find_dict)):
-                        found.append(context)
+                    context_matches = []
+                    for el in context[1]:
+                        if checker(el.findParent(tag, find_dict)):
+                            context_matches.append(el)
+                    if context_matches:
+                        found.append(
+                            (context[0], context_matches),
+                        )
             elif operator == '>':
                 # for each context in current_context,
                 # check if the parent satisfies the provided
                 # arguments.
                 for context in current_context:
-                    if checker(context.findParent(tag, find_dict)) == context.parent:
-                        found.append(context)
+                    context_matches = []
+                    for el in context[1]:
+                        if checker(el.findParent(tag, find_dict)) == el.parent:
+                            context_matches.append(el.parent)
+                    if context_matches:
+                        found.append(
+                            (context[0], context_matches),
+                        )
             elif operator == '~':
                 # for each context in current_context
                 # check 
@@ -159,8 +173,14 @@ def select(soup, selector):
                 # check if the preceding sibling satisfies the
                 # provided arguments
                 for context in current_context:
-                    if checker(context.findPreviousSibling(tag, find_dict)) == context.previousSibling:
-                        found.append(context)
+                    context_matches = []
+                    for el in context[1]:
+                        if checker(context.findPreviousSibling(tag, find_dict)) == el.previousSibling:
+                            context_matches.append(el.previousSibling)
+                    if context_matches:
+                        found.append(
+                            (context[0], context_matches)
+                        )
             current_context = found
         else:
             # Get the next operator (whitespace, >, ~, +)
@@ -172,7 +192,7 @@ def select(soup, selector):
             else:
                 operator = ' '
             selector = selector.rsplit(operator, 1)[0].rstrip()
-    return current_context
+    return [entry[0] for entry in current_context]
 
 def monkeypatch(BeautifulSoupClass=None):
     """
