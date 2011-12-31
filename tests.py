@@ -281,6 +281,13 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
+    def test_child_follow_by_first_child_selector_with_comments(self):
+        html = """<h1> <!-- enough said --><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > :first-child { color: red; }"""
+        expected = u"""<h1> <!-- enough said --><span style="color: red">Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
     def test_child_follow_by_first_child_selector_complex_dom(self):
         html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
         css = """h1 > :first-child { color: red; }"""

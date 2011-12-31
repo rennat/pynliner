@@ -44,8 +44,9 @@ def get_attribute_checker(operator, attribute, value=''):
     }.get(operator, lambda el: el.has_key(attribute))
 
 def is_white_space(el):
-    # @TODO - should also check for comments etc?
     if isinstance(el, BeautifulSoup.NavigableString) and str(el).strip() == '':
+        return True
+    if isinstance(el, BeautifulSoup.Comment):
         return True
     return False
 
