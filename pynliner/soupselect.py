@@ -15,6 +15,7 @@ select(soup, 'div#main ul a')
 patched to support multiple class selectors here http://code.google.com/p/soupselect/issues/detail?id=4#c0
 """
 import re
+import BeautifulSoup
 
 attribute_regex = re.compile('\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
 pseudo_classes_regexes = (
@@ -42,6 +43,28 @@ def get_attribute_checker(operator, attribute, value=''):
             or el.get(attribute, '').startswith('%s-' % value),
     }.get(operator, lambda el: el.has_key(attribute))
 
+def is_white_space(el):
+    # @TODO - should also check for comments etc?
+    if isinstance(el, BeautifulSoup.NavigableString) and str(el).strip() == '':
+        return True
+    return False
+
+def is_last_content_node(el):
+    result = False
+    if el is None:
+        result = True
+    elif is_white_space(el):
+        result = is_last_content_node(el.nextSibling)
+    return result
+
+def is_first_content_node(el):
+    result = False
+    if el is None:
+        result = True
+    if is_white_space(el):
+        result = is_first_content_node(el.previousSibling)
+    return result
+        
 def get_pseudo_class_checker(psuedo_class):
     """
     Takes a psuedo_class, like "first-child" or "last-child"
@@ -49,8 +72,8 @@ def get_pseudo_class_checker(psuedo_class):
     that psuedo class
     """
     return {
-        'first-child': lambda el: el.previousSibling is None,
-        'last-child': lambda el: el.nextSibling is None
+        'first-child': lambda el: is_first_content_node(el.previousSibling),
+        'last-child': lambda el: is_last_content_node(el.nextSibling)
     }.get(psuedo_class)
 
 def get_checker(functions):
