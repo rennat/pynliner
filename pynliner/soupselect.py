@@ -98,7 +98,7 @@ def select(soup, selector):
         if handle_token:
             # Get the rightmost token
             handle_token = False
-            match = re.search('([0-9a-zA-Z-#.:*"\'\[\\]=]+)$', selector)
+            match = re.search('([_0-9a-zA-Z-#.:*"\'\[\\]=]+)$', selector)
             if not match:
                 raise Exception("No match was found. We're done or something is broken")
             token = match.groups(1)[0]
