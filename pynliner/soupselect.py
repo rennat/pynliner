@@ -18,10 +18,8 @@ patched to support multiple class selectors here http://code.google.com/p/soupse
 
 import re
 
-tag_re = re.compile('^[a-z0-9]+$')
-
 attribselect_re = re.compile(
-    r'^(?P<tag>\w+)?\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)' + 
+    r'^(?P<tag>\w+)?\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)' +
     r'=?"?(?P<value>[^\]"]*)"?\]$'
 )
 
@@ -30,7 +28,7 @@ attribselect_re = re.compile(
 #     |      |         |               |
 #     |      |         |           The value
 #     |      |    ~,|,^,$,* or =
-#     |   Attribute 
+#     |   Attribute
 #    Tag
 
 def attribute_checker(operator, attribute, value=''):
@@ -54,11 +52,18 @@ def attribute_checker(operator, attribute, value=''):
     }.get(operator, lambda el: el.has_key(attribute))
 
 
-def select(soup, selector):
+def select(soup, selector, case_sensitive=True):
     """
-    soup should be a BeautifulSoup instance; selector is a CSS selector 
+    soup should be a BeautifulSoup instance; selector is a CSS selector
     specifying the elements you want to retrieve.
     """
+    if not case_sensitive:
+        re_flags = re.I
+    else:
+        re_flags = 0
+
+    tag_re = re.compile('^[a-z0-9]+$', re_flags)
+
     tokens = selector.split()
     current_context = [soup]
     for token in tokens:
@@ -68,6 +73,9 @@ def select(soup, selector):
             tag, attribute, operator, value = m.groups()
             if not tag:
                 tag = True
+            else:
+                tag = re.compile("^%s$" % tag, re_flags)  # case sensitive/insensitive search
+
             checker = attribute_checker(operator, attribute, value)
             found = []
             for context in current_context:
@@ -79,9 +87,12 @@ def select(soup, selector):
             tag, id = token.split('#', 1)
             if not tag:
                 tag = True
+            else:
+                tag = re.compile("^%s$" % tag, re_flags)  # case sensitive/insensitive search
+
             el = current_context[0].find(tag, {'id': id})
             if not el:
-                return [] # No match
+                return []  # No match
             current_context = [el]
             continue
         if '.' in token:
@@ -89,13 +100,20 @@ def select(soup, selector):
             tag, klass = token.split('.', 1)
             if not tag:
                 tag = True
+            else:
+                tag = re.compile("^%s$" % tag, re_flags)  # case sensitive/insensitive search
+
             found = []
+
+            if re_flags == re.I:
+                found_attrs = {'class': lambda attr: attr and klass.lower() in [x.lower() for x in attr.split()]}
+            else:
+                found_attrs = {'class': lambda attr: attr and set(klass.split('.')).issubset(attr.split())}
+
             for context in current_context:
                 found.extend(
-                    context.findAll(tag,
-                        {'class': lambda attr: attr and set(klass.split('.')).issubset(attr.split())}
+                    context.findAll(tag, found_attrs)
                     )
-                )
             current_context = found
             continue
         if token == '*':
@@ -109,6 +127,9 @@ def select(soup, selector):
         if not tag_re.match(token):
             return []
         found = []
+
+        token = re.compile("^%s$" % token, re_flags)  # case sensitive/insensitive search
+
         for context in current_context:
             found.extend(context.findAll(token))
         current_context = found
@@ -116,7 +137,7 @@ def select(soup, selector):
 
 def monkeypatch(BeautifulSoupClass=None):
     """
-    If you don't explicitly state the class to patch, defaults to the most 
+    If you don't explicitly state the class to patch, defaults to the most
     common import location for BeautifulSoup.
     """
     if not BeautifulSoupClass:

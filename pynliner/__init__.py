@@ -30,8 +30,9 @@ class Pynliner(object):
     stylesheet = False
     output = False
 
-    def __init__(self, log=None):
+    def __init__(self, log=None, case_sensitive=True):
         self.log = log
+        self.case_sensitive = case_sensitive
         cssutils.log.enabled = False if log is None else True
 
     def from_url(self, url):
@@ -82,7 +83,7 @@ class Pynliner(object):
             self.style_string += cssString + u'\n'
         return self
 
-    def run(self):
+    def run(self, prettify=False):
         """Applies each step of the process if they have not already been
         performed.
 
@@ -97,7 +98,7 @@ class Pynliner(object):
         if not self.stylesheet:
             self._get_styles()
         self._apply_styles()
-        return self._get_output()
+        return self._get_output(prettify=prettify)
 
     def _get_url(self, url):
         """Returns the response content from the given url
@@ -190,7 +191,7 @@ class Pynliner(object):
             selectors = rule.selectorText.split(',')
             elements = []
             for selector in selectors:
-                elements += select(self.soup, selector)
+                elements += select(self.soup, selector, self.case_sensitive)
             # build prop_list for each selected element
             for elem in elements:
                 if elem not in elem_prop_map:
@@ -211,7 +212,6 @@ class Pynliner(object):
                 for prop in prop_list:
                     elem_style_map[elem][prop.name] = prop.value
 
-
         # apply rules to elements
         for elem, style_declaration in elem_style_map.items():
             if elem.has_key('style'):
@@ -219,12 +219,15 @@ class Pynliner(object):
             else:
                 elem['style'] = style_declaration.cssText.replace('\n', ' ')
 
-    def _get_output(self):
+    def _get_output(self, prettify=False):
         """Generate Unicode string of `self.soup` and set it to `self.output`
 
         Returns self.output
         """
-        self.output = unicode(str(self.soup))
+        if prettify:
+            self.output = self.soup.prettify()
+        else:
+            self.output = unicode(str(self.soup))
         return self.output
 
 def fromURL(url, log=None):
@@ -236,12 +239,12 @@ def fromURL(url, log=None):
     """
     return Pynliner(log).from_url(url).run()
 
-def fromString(string, log=None):
+def fromString(string, log=None, case_sensitive=True):
     """Shortcut Pynliner constructor. Equivelent to:
 
     >>> Pynliner().from_string(someString).run()
 
     Returns processed HTML string.
     """
-    return Pynliner(log).from_string(string).run()
+    return Pynliner(log, case_sensitive=case_sensitive).from_string(string).run()
 
