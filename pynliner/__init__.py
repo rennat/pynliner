@@ -21,6 +21,7 @@ import urllib2
 import cssutils
 from BeautifulSoup import BeautifulSoup
 from soupselect import select
+from collections import defaultdict
 
 class Pynliner(object):
     """Pynliner class"""
@@ -180,51 +181,48 @@ class Pynliner(object):
         """Steps through CSS rules and applies each to all the proper elements
         as @style attributes prepending any current @style attributes.
         """
-        rules = self.stylesheet.cssRules.rulesOfType(1)
-        elem_prop_map = {}
-        elem_style_map = {}
+        elem_prop_map = defaultdict(list)
 
         # build up a property list for every styled element
-        for rule in rules:
+        for rule in self.stylesheet.cssRules.rulesOfType(1):
             # select elements for every selector
             selectors = rule.selectorText.split(',')
-            elements = []
+            elements = set()
             for selector in selectors:
-                elements += select(self.soup, selector)
+                elements |= set(select(self.soup, selector))
             # build prop_list for each selected element
             for elem in elements:
-                if elem not in elem_prop_map:
-                    elem_prop_map[elem] = []
                 elem_prop_map[elem].append({
                     'specificity': self._get_rule_specificity(rule),
-                    'props': rule.style.getProperties(),
+                    'style': rule.style,
                 })
 
         # build up another property list using selector specificity
-        for elem, props in elem_prop_map.items():
-            if elem not in elem_style_map:
-                elem_style_map[elem] = cssutils.css.CSSStyleDeclaration()
-            # ascending sort of prop_lists based on specificity
-            props = sorted(props, key=lambda p: p['specificity'])
-            # for each prop_list, apply to CSSStyleDeclaration
-            for prop_list in map(lambda obj: obj['props'], props):
-                for prop in prop_list:
-                    elem_style_map[elem][prop.name] = prop.value
-
-
-        # apply rules to elements
-        for elem, style_declaration in elem_style_map.items():
-            if elem.has_key('style'):
-                elem['style'] = u'%s; %s' % (style_declaration.cssText.replace('\n', ' '), elem['style'])
+        for elem, props in elem_prop_map.iteritems():
+            if len(props) == 1:
+                style = props[0]["style"]
             else:
-                elem['style'] = style_declaration.cssText.replace('\n', ' ')
+                style = cssutils.css.cssstyledeclaration.CSSStyleDeclaration()
+
+                # ascending sort of prop_lists based on specificity
+                props = sorted(props, key=lambda p: p['specificity'])
+
+                # for each prop_list, apply to CSSStyleDeclaration
+                for prop_holder in props:
+                    for prop in prop_holder['style'].getProperties():
+                        style[prop.name] = prop.value
+
+            if elem.has_key('style'):
+                elem['style'] = u'%s; %s' % (style.cssText.replace('\n', ' '), elem['style'])
+            else:
+                elem['style'] = style.cssText.replace('\n', ' ')
 
     def _get_output(self):
         """Generate Unicode string of `self.soup` and set it to `self.output`
 
         Returns self.output
         """
-        self.output = unicode(str(self.soup))
+        self.output = unicode(self.soup)
         return self.output
 
 def fromURL(url, log=None):

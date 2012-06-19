@@ -69,22 +69,20 @@ def select(soup, selector):
             if not tag:
                 tag = True
             checker = attribute_checker(operator, attribute, value)
-            found = []
-            for context in current_context:
-                found.extend([el for el in context.findAll(tag) if checker(el)])
-            current_context = found
-            continue
-        if '#' in token:
+            current_context = [el for el in context.findAll(tag) if checker(el)]
+        elif '#' in token:
             # ID selector
             tag, id = token.split('#', 1)
             if not tag:
                 tag = True
-            el = current_context[0].find(tag, {'id': id})
-            if not el:
-                return [] # No match
-            current_context = [el]
-            continue
-        if '.' in token:
+
+            found = []
+            for context in current_context:
+                el = context.find(tag, {'id': id})
+                if el:
+                    found.append(el)
+            current_context = found
+        elif '.' in token:
             # Class selector
             tag, klass = token.split('.', 1)
             if not tag:
@@ -97,21 +95,23 @@ def select(soup, selector):
                     )
                 )
             current_context = found
-            continue
-        if token == '*':
+        elif token == '*':
             # Star selector
             found = []
             for context in current_context:
                 found.extend(context.findAll(True))
             current_context = found
-            continue
-        # Here we should just have a regular tag
-        if not tag_re.match(token):
+        elif tag_re.match(token):
+            found = []
+            for context in current_context:
+                found.extend(context.findAll(token))
+            current_context = found
+        else:
+            current_context = []
+
+        if not current_context:
             return []
-        found = []
-        for context in current_context:
-            found.extend(context.findAll(token))
-        current_context = found
+
     return current_context
 
 def monkeypatch(BeautifulSoupClass=None):
