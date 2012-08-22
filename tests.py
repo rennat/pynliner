@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import unittest
 import pynliner
@@ -96,6 +97,7 @@ class Basic(unittest.TestCase):
         expected = '<h1 id="test" style="color: blue">Hello world!</h1>'
         output = Pynliner().from_string(html).run()
         self.assertEqual(expected, output)
+
 
 
 class CommaSelector(unittest.TestCase):
@@ -205,6 +207,12 @@ class BeautifulSoupBugs(unittest.TestCase):
 
     def test_double_comment(self):
         self.html = """<!-- comment -->"""
+        output = pynliner.fromString(self.html)
+        self.assertNotIn("<!--<!--", output)
+
+
+    def test_double_comment_and_unicode(self):
+        self.html = """<!-- comment ää -->"""
         output = pynliner.fromString(self.html)
         self.assertNotIn("<!--<!--", output)
 
