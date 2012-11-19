@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='pynliner',
       version='0.4.0',
@@ -8,8 +8,8 @@ setup(name='pynliner',
       author='Tanner Netterville',
       author_email='tannern@gmail.com',
       packages=('pynliner',),
-      requires=('BeautifulSoup(<4.0)',
-                'cssutils(>=0.9.7)',
+      install_requires=('BeautifulSoup<4.0',
+                'cssutils>=0.9.7',
                 ),
       provides=('pynliner',),
      )
