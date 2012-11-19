@@ -395,5 +395,13 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
+    def test_unicode_content(self):
+        html = u"""<h1>Hello World!</h1><p>\u2022 point</p>"""
+        css = """h1 { color: red; }"""
+        expected = u"""<h1 style="color: red">Hello World!</h1><p>\u2022 point</p>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+
 if __name__ == '__main__':
     unittest.main()
