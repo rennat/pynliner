@@ -5,7 +5,7 @@ import pynliner
 import StringIO
 import logging
 import cssutils
-from pynliner import Pynliner
+from pynliner import Pynliner, fromString
 
 class Basic(unittest.TestCase):
 
@@ -251,6 +251,15 @@ class ComplexSelectors(unittest.TestCase):
         expected = u"""<h1 title="foo" style="color: red">Hello World!</h1>"""
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
+
+
+
+class UnicodeTest(unittest.TestCase):
+    """Tests for unicode."""
+
+    def test_unicode_characters(self):
+        self.assertEqual(fromString('<p>\xe4\xbd\xa0\xe5\xa5\xbd</p>'),
+                                    u'<p>\u4f60\u597d</p>')
 
 if __name__ == '__main__':
     unittest.main()
