@@ -5,6 +5,7 @@ import pynliner
 import StringIO
 import logging
 import cssutils
+import mock
 from pynliner import Pynliner
 
 class Basic(unittest.TestCase):
@@ -61,17 +62,33 @@ class Basic(unittest.TestCase):
         """Test 'fromURL' constructor"""
         url = 'http://media.tannern.com/pynliner/test.html'
         p = Pynliner()
-        p.from_url(url)
+        with mock.patch.object(Pynliner, '_get_url') as mock_method:
+            mock_method.return_value = u"""<?xml version='1.0' encoding='utf-8'?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>test</title>
+<link rel="stylesheet" type="text/css" href="test.css"/>
+<style type="text/css">h1 {color: #fc0;}</style>
+</head>
+<body>
+<h1>Hello World!</h1>
+<p>Possim tincidunt putamus iriure eu nulla. Facer qui volutpat ut aliquam sequitur. Mutationem legere feugiat autem clari notare. Nulla typi augue suscipit lectores in.</p>
+<p>Facilisis claritatem eum decima dignissim legentis. Nulla per legentis odio molestie quarta. Et velit typi claritas ipsum ullamcorper.</p>
+</body>
+</html>"""
+            p.from_url(url)
         self.assertEqual(p.root_url, 'http://media.tannern.com')
         self.assertEqual(p.relative_url, 'http://media.tannern.com/pynliner/')
 
         p._get_soup()
 
-        p._get_external_styles()
+        with mock.patch.object(Pynliner, '_get_url') as mock_method:
+            mock_method.return_value = 'p {color: #999}'
+            p._get_external_styles()
         self.assertEqual(p.style_string, "p {color: #999}")
 
         p._get_internal_styles()
-        self.assertEqual(p.style_string, "p {color: #999}\nh1 {color: #ffcc00;}\n")
+        self.assertEqual(p.style_string, "p {color: #999}\nh1 {color: #fc0;}\n")
 
         p._get_styles()
 
