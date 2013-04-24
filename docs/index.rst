@@ -9,7 +9,7 @@ Project pages
 
 - PyPI package page: http://pypi.python.org/pypi/pynliner
 - github project page: http://github.com/rennat/pynliner
-- this documentation: http://packages.python.org/pynliner
+- this documentation: http://pythonhosted.org/pynliner
 
 installation
 ------------
@@ -49,3 +49,14 @@ methods
 .. automethod :: pynliner.Pynliner.from_string
 .. automethod :: pynliner.Pynliner.with_cssString
 .. automethod :: pynliner.Pynliner.run
+
+
+changelog
+=========
+
+0.5.0
+-----
+
+- started keeping track of changes here.
+- improve CSS capabilities
+- abandon old versions of BeautifulSoup (pre 3.2.1) in favor of full unicode support

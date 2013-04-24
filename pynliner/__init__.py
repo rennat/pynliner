@@ -5,7 +5,7 @@
 Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and
 cssutils
 
-Copyright (c) 2011 Tanner Netterville
+Copyright (c) 2011-2013 Tanner Netterville
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -30,7 +30,7 @@ TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 
 """
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 import urllib2
 import cssutils
