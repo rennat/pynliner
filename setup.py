@@ -9,10 +9,10 @@ setup(name='pynliner',
                   ' BeautifulSoup and cssutils',
       author='Tanner Netterville',
       author_email='tannern@gmail.com',
-      packages=('pynliner',),
-      install_requires=('BeautifulSoup<4.0',
-                        'cssutils>=0.9.7',
-                        'mock',
-      ),
-      provides=('pynliner',)
-)
+      packages=['pynliner'],
+      requires=[
+          'BeautifulSoup<4.0',
+          'cssutils>=0.9.7',
+          'mock'
+      ],
+      provides=['pynliner'])
