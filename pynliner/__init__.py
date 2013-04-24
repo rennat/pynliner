@@ -1,17 +1,32 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """Pynliner : Convert CSS to inline styles
 
-Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and cssutils
+Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and
+cssutils
 
 Copyright (c) 2011 Tanner Netterville
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
 
-The generated output of this software shall not be used in a mass marketing service.
+The generated output of this software shall not be used in a mass marketing
+service.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
+ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
 
@@ -21,6 +36,7 @@ import urllib2
 import cssutils
 from BeautifulSoup import BeautifulSoup
 from soupselect import select
+
 
 class Pynliner(object):
     """Pynliner class"""
@@ -59,7 +75,7 @@ class Pynliner(object):
         Returns self.
 
         >>> p = Pynliner()
-        >>> p.from_string('<style>h1 { color:#ffcc00; }</style><h1>Hello World!</h1>')
+        >>> p.from_string('<style>h1 {color:#ffcc00;}</style><h1>Hi</h1>')
         <Pynliner object at 0x26ac70>
         """
         self.source_string = string
@@ -107,9 +123,11 @@ class Pynliner(object):
     def _get_soup(self):
         """Convert source string to BeautifulSoup object. Sets it to self.soup.
 
-        If using mod_wgsi, use html5 parsing to prevent BeautifulSoup incompatibility.
+        If using mod_wgsi, use html5 parsing to prevent BeautifulSoup
+        incompatibility.
         """
-        # Check if mod_wsgi is running - see http://code.google.com/p/modwsgi/wiki/TipsAndTricks
+        # Check if mod_wsgi is running
+        # - see http://code.google.com/p/modwsgi/wiki/TipsAndTricks
         try:
             from mod_wsgi import version
             self.soup = BeautifulSoup(self.source_string, "html5lib")
@@ -228,7 +246,7 @@ class Pynliner(object):
         return self.output
 
 def fromURL(url, log=None):
-    """Shortcut Pynliner constructor. Equivelent to:
+    """Shortcut Pynliner constructor. Equivalent to:
 
     >>> Pynliner().from_url(someURL).run()
 
@@ -237,7 +255,7 @@ def fromURL(url, log=None):
     return Pynliner(log).from_url(url).run()
 
 def fromString(string, log=None):
-    """Shortcut Pynliner constructor. Equivelent to:
+    """Shortcut Pynliner constructor. Equivalent to:
 
     >>> Pynliner().from_string(someString).run()
 
