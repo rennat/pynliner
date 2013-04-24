@@ -60,11 +60,10 @@ class Basic(unittest.TestCase):
 
     def test_fromURL(self):
         """Test 'fromURL' constructor"""
-        return
         url = 'http://media.tannern.com/pynliner/test.html'
         p = Pynliner()
-        with mock.patch.object(Pynliner, '_get_url') as mock_method:
-            mock_method.return_value = u"""<?xml version='1.0' encoding='utf-8'?>
+        with mock.patch.object(Pynliner, '_get_url') as mocked:
+            mocked.return_value = u"""<?xml version='1.0' encoding='utf-8'?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>test</title>
@@ -82,8 +81,8 @@ class Basic(unittest.TestCase):
 
         p._get_soup()
 
-        with mock.patch.object(Pynliner, '_get_url') as mock_method:
-            mock_method.return_value = 'p {color: #999}'
+        with mock.patch.object(Pynliner, '_get_url') as mocked:
+            mocked.return_value = 'p {color: #999}'
             p._get_external_styles()
         self.assertEqual(p.style_string, "p {color: #999}")
 
