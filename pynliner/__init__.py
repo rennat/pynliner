@@ -241,7 +241,7 @@ class Pynliner(object):
 
         Returns self.output
         """
-        self.output = unicode(str(self.soup))
+        self.output = unicode(self.soup)
         return self.output
 
 def fromURL(url, log=None):
@@ -261,4 +261,3 @@ def fromString(string, log=None):
     Returns processed HTML string.
     """
     return Pynliner(log).from_string(string).run()
-

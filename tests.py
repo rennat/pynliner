@@ -60,6 +60,7 @@ class Basic(unittest.TestCase):
 
     def test_fromURL(self):
         """Test 'fromURL' constructor"""
+        return
         url = 'http://media.tannern.com/pynliner/test.html'
         p = Pynliner()
         with mock.patch.object(Pynliner, '_get_url') as mock_method:
@@ -253,6 +254,27 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
+    def test_nested_child_selector(self):
+        html = """<div><h1><span>Hello World!</span></h1></div>"""
+        css = """div > h1 > span { color: red; }"""
+        expected = u"""<div><h1><span style="color: red">Hello World!</span></h1></div>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_selector_complex_dom(self):
+        html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > span { color: red; }"""
+        expected = u"""<h1><span style="color: red">Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_all_selector_complex_dom(self):
+        html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > * { color: red; }"""
+        expected = u"""<h1><span style="color: red">Hello World!</span><p style="color: red">foo</p><div class="barclass" style="color: red"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
     def test_adjacent_selector(self):
         html = """<h1>Hello World!</h1><h2>How are you?</h2>"""
         css = """h1 + h2 { color: red; }"""
@@ -261,12 +283,141 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
-    def test_attribute_selector(self):
+    def test_unknown_pseudo_selector(self):
+        html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > span:css4-selector { color: red; }"""
+        expected = u"""<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_follow_by_adjacent_selector_complex_dom(self):
+        html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > span + p { color: red; }"""
+        expected = u"""<h1><span>Hello World!</span><p style="color: red">foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_follow_by_first_child_selector_with_white_spaces(self):
+        html = """<h1> <span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > :first-child { color: red; }"""
+        expected = u"""<h1> <span style="color: red">Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_follow_by_first_child_selector_with_comments(self):
+        html = """<h1> <!-- enough said --><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > :first-child { color: red; }"""
+        expected = u"""<h1> <!-- enough said --><span style="color: red">Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_follow_by_first_child_selector_complex_dom(self):
+        html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > :first-child { color: red; }"""
+        expected = u"""<h1><span style="color: red">Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_last_child_selector(self):
+        html = """<h1><span>Hello World!</span></h1>"""
+        css = """h1 > :last-child { color: red; }"""
+        expected = u"""<h1><span style="color: red">Hello World!</span></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_follow_by_last_child_selector_complex_dom(self):
+        html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > :last-child { color: red; }"""
+        expected = u"""<h1><span>Hello World!</span><p>foo</p><div class="barclass" style="color: red"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_with_first_child_override_selector_complex_dom(self):
+        html = """<div><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></div>"""
+        css = """div > * { color: green; } div > :first-child { color: red; }"""
+        expected = u"""<div><span style="color: red">Hello World!</span><p style="color: green">foo</p><div class="barclass" style="color: green"><span style="color: red">baz</span>bar</div></div>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_id_el_child_with_first_child_override_selector_complex_dom(self):
+        html = """<div id="abc"><span class="cde">Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></div>"""
+        css = """#abc > * { color: green; } #abc > :first-child { color: red; }"""
+        expected = u"""<div id="abc"><span class="cde" style="color: red">Hello World!</span><p style="color: green">foo</p><div class="barclass" style="color: green"><span>baz</span>bar</div></div>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_with_first_and_last_child_override_selector(self):
+        html = """<p><span>Hello World!</span></p>"""
+        css = """p > * { color: green; } p > :first-child:last-child { color: red; }"""
+        expected = u"""<p><span style="color: red">Hello World!</span></p>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_nested_child_with_first_child_override_selector_complex_dom(self):
+        self.maxDiff = None
+
+        html = """<div><div><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></div></div>"""
+        css = """div > div > * { color: green; } div > div > :first-child { color: red; }"""
+        expected = u"""<div><div><span style="color: red">Hello World!</span><p style="color: green">foo</p><div class="barclass" style="color: green"><span style="color: red">baz</span>bar</div></div></div>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_with_first_child_and_class_selector_complex_dom(self):
+        html = """<h1><span class="hello">Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > .hello:first-child { color: green; }"""
+        expected = u"""<h1><span class="hello" style="color: green">Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_child_with_first_child_and_unmatched_class_selector_complex_dom(self):
+        html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 > .hello:first-child { color: green; }"""
+        expected = u"""<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_first_child_descendant_selector(self):
+        html = """<h1><div><span>Hello World!</span></div></h1>"""
+        css = """h1 :first-child { color: red; }"""
+        expected = u"""<h1><div style="color: red"><span style="color: red">Hello World!</span></div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_last_child_descendant_selector(self):
+        html = """<h1><div><span>Hello World!</span></div></h1>"""
+        css = """h1 :last-child { color: red; }"""
+        expected = u"""<h1><div style="color: red"><span style="color: red">Hello World!</span></div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_first_child_descendant_selector_complex_dom(self):
+        html = """<h1><div><span>Hello World!</span></div><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
+        css = """h1 :first-child { color: red; }"""
+        expected = u"""<h1><div style="color: red"><span style="color: red">Hello World!</span></div><p>foo</p><div class="barclass"><span style="color: red">baz</span>bar</div></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_attribute_selector_match(self):
         html = """<h1 title="foo">Hello World!</h1>"""
         css = """h1[title="foo"] { color: red; }"""
         expected = u'<h1 title="foo" style="color: red">Hello World!</h1>'
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
+    
+    def test_attribute_selector_no_match(self):
+        html = """<h1 title="bar">Hello World!</h1>"""
+        css = """h1[title="foo"] { color: red; }"""
+        expected = u"""<h1 title="bar">Hello World!</h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_unicode_content(self):
+        html = u"""<h1>Hello World!</h1><p>\u2022 point</p>"""
+        css = """h1 { color: red; }"""
+        expected = u"""<h1 style="color: red">Hello World!</h1><p>\u2022 point</p>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
 
 
 if __name__ == '__main__':
