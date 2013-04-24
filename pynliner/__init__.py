@@ -49,6 +49,7 @@ class Pynliner(object):
     def __init__(self, log=None):
         self.log = log
         cssutils.log.enabled = False if log is None else True
+        self.extra_style_strings = []
 
     def from_url(self, url):
         """Gets remote HTML page for conversion
@@ -81,7 +82,7 @@ class Pynliner(object):
         self.source_string = string
         return self
 
-    def with_cssString(self, cssString):
+    def with_cssString(self, css_string):
         """Adds external CSS to the Pynliner object. Can be "chained".
 
         Returns self.
@@ -92,10 +93,7 @@ class Pynliner(object):
         >>> p.from_string(html).with_cssString(css)
         <pynliner.Pynliner object at 0x2ca810>
         """
-        if not self.style_string:
-            self.style_string = cssString + u'\n'
-        else:
-            self.style_string += cssString + u'\n'
+        self.extra_style_strings.append(css_string)
         return self
 
     def run(self):
@@ -142,7 +140,8 @@ class Pynliner(object):
         """
         self._get_external_styles()
         self._get_internal_styles()
-
+        for style_string in self.extra_style_strings:
+            self.style_string += style_string
         cssparser = cssutils.CSSParser(log=self.log)
         self.stylesheet = cssparser.parseString(self.style_string)
 

@@ -47,13 +47,10 @@ class Basic(unittest.TestCase):
 
     def test_with_cssString(self):
         """Test 'with_cssString' method"""
-        cssString = 'h1 {font-size: 2em;}'
-        self.p = Pynliner().from_string(self.html).with_cssString(cssString)
-        self.assertEqual(self.p.style_string, cssString + '\n')
-
+        cssString = 'h1 {color: #f00;}'
+        self.p.with_cssString(cssString)
         output = self.p.run()
-        self.assertEqual(output, u'<h1 style="font-size: 2em; color: #fc0">Hello World!</h1>')
-
+        self.assertEqual(output, u'<h1 style="color: #f00">Hello World!</h1>')
 
     def test_fromString(self):
         """Test 'fromString' complete"""
@@ -154,10 +151,8 @@ class CommaSelector(unittest.TestCase):
         """Test 'with_cssString' method"""
         cssString = '.b1,.b2 {font-size: 2em;}'
         self.p = Pynliner().from_string(self.html).with_cssString(cssString)
-        self.assertEqual(self.p.style_string, cssString + '\n')
-
         output = self.p.run()
-        self.assertEqual(output, u'<span class="b1" style="font-size: 2em; font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-size: 2em; font-weight: bold">Bold Red</span>')
+        self.assertEqual(output, u'<span class="b1" style="font-weight: bold; font-size: 2em">Bold</span><span class="b2 c" style="color: red; font-weight: bold; font-size: 2em">Bold Red</span>')
 
     def test_fromString(self):
         """Test 'fromString' complete"""
