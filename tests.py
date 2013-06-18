@@ -417,6 +417,18 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
+    def test_conditional_comments(self):
+        html = """<div><!--[if mso]>
+  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#"><w:anchorlock/>
+  <![endif]-->
+      <a href="#">Confirm</a>
+  <!--[if mso]>
+  </v:roundrect>
+<![endif]--></div>"""
+        output = Pynliner().from_string(html).run()
+        self.assertEqual(output, html)
+    
+
 
 
 if __name__ == '__main__':
