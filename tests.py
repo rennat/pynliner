@@ -402,7 +402,7 @@ class ComplexSelectors(unittest.TestCase):
         expected = u'<h1 title="foo" style="color: red">Hello World!</h1>'
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
-    
+
     def test_attribute_selector_no_match(self):
         html = """<h1 title="bar">Hello World!</h1>"""
         css = """h1[title="foo"] { color: red; }"""
@@ -417,6 +417,12 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
+    def test_conditional_comments(self):
+        html = """<div><!--[if mso]>content
+  <![endif]-->content<!--[if mso]>content<![endif]-->
+  </div>"""
+        output = Pynliner().from_string(html).run()
+        self.assertEqual(output, html)
 
 
 if __name__ == '__main__':
