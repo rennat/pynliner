@@ -113,6 +113,19 @@ class Basic(unittest.TestCase):
         output = Pynliner().from_string(html).run()
         self.assertEqual(expected, output)
 
+    def test_unicode_content(self):
+        html = u"""<h1>Hello World!</h1><p>\u2022 point</p>"""
+        css = """h1 { color: red; }"""
+        expected = u"""<h1 style="color: red">Hello World!</h1><p>\u2022 point</p>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_conditional_comments(self):
+        html = "<!-- <normal> --><!--[if condition]><p>special</p><![endif]-->"
+        expected = "<!-- &lt;normal&gt; --><!--[if condition]><p>special</p><![endif]-->"
+        output = Pynliner(allow_conditional_comments=True).from_string(html).run()
+        self.assertEqual(output, expected)
+
 
 class CommaSelector(unittest.TestCase):
     def setUp(self):
@@ -409,20 +422,6 @@ class ComplexSelectors(unittest.TestCase):
         expected = u"""<h1 title="bar">Hello World!</h1>"""
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
-
-    def test_unicode_content(self):
-        html = u"""<h1>Hello World!</h1><p>\u2022 point</p>"""
-        css = """h1 { color: red; }"""
-        expected = u"""<h1 style="color: red">Hello World!</h1><p>\u2022 point</p>"""
-        output = Pynliner().from_string(html).with_cssString(css).run()
-        self.assertEqual(output, expected)
-
-    def test_conditional_comments(self):
-        html = """<div><!--[if mso]>content
-  <![endif]-->content<!--[if mso]>content<![endif]-->
-  </div>"""
-        output = Pynliner().from_string(html).run()
-        self.assertEqual(output, html)
 
 
 if __name__ == '__main__':

@@ -32,9 +32,10 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 __version__ = "0.5.0"
 
+import re
 import urllib2
 import cssutils
-from BeautifulSoup import BeautifulSoup
+from BeautifulSoup import BeautifulSoup, Comment
 from soupselect import select
 
 
@@ -46,10 +47,11 @@ class Pynliner(object):
     stylesheet = False
     output = False
 
-    def __init__(self, log=None):
+    def __init__(self, log=None, allow_conditional_comments=False):
         self.log = log
         cssutils.log.enabled = False if log is None else True
         self.extra_style_strings = []
+        self.allow_conditional_comments = allow_conditional_comments
 
     def from_url(self, url):
         """Gets remote HTML page for conversion
@@ -111,7 +113,9 @@ class Pynliner(object):
         if not self.stylesheet:
             self._get_styles()
         self._apply_styles()
-        return self._get_output()
+        self._get_output()
+        self._clean_output()
+        return self.output
 
     def _get_url(self, url):
         """Returns the response content from the given url
@@ -235,7 +239,7 @@ class Pynliner(object):
                 elem['style'] = u'%s; %s' % (style_declaration.cssText.replace('\n', ' '), elem['style'])
             else:
                 elem['style'] = style_declaration.cssText.replace('\n', ' ')
-
+        
     def _get_output(self):
         """Generate Unicode string of `self.soup` and set it to `self.output`
 
@@ -243,6 +247,19 @@ class Pynliner(object):
         """
         self.output = unicode(self.soup)
         return self.output
+    
+    def _clean_output(self):
+        """Clean up after BeautifulSoup's output.
+        """
+        if self.allow_conditional_comments:
+            matches = re.finditer('(<!--\[if .+\].+?&lt;!\[endif\]-->)', self.output)
+            for match in matches:
+                comment = match.group()
+                comment = comment.replace('&gt;', '>')
+                comment = comment.replace('&lt;', '<')
+                self.output = (self.output[:match.start()] + comment +
+                               self.output[match.end():])
+
 
 def fromURL(url, log=None):
     """Shortcut Pynliner constructor. Equivalent to:
