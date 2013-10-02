@@ -127,6 +127,44 @@ class Basic(unittest.TestCase):
         self.assertEqual(output, expected)
 
 
+class ExternalStyles(unittest.TestCase):
+    def setUp(self):
+        self.html_template = """<link rel="stylesheet" href="{href}"></link><span class="b1">Bold</span><span class="b2 c">Bold Red</span>"""
+        self.root_url = 'http://server.com'
+        self.relative_url = 'http://server.com/parent/child/'
+
+    def _test_external_url(self, url, expected_url):
+        with mock.patch.object(Pynliner, '_get_url') as mocked:
+            def check_url(url):
+                self.assertEqual(url, expected_url)
+                return ".b1,.b2 { font-weight:bold; } .c {color: red}"
+            mocked.side_effect = check_url
+            p = Pynliner()
+            p.root_url = self.root_url
+            p.relative_url = self.relative_url
+            p.from_string(self.html_template.format(href=url))
+            p._get_soup()
+            p._get_styles()
+
+    def test_simple_url(self):
+        self._test_external_url('test.css', 'http://server.com/parent/child/test.css')
+
+    def test_relative_url(self):
+        self._test_external_url('../test.css', 'http://server.com/parent/test.css')
+
+    def test_absolute_url(self):
+        self._test_external_url('/something/test.css', 'http://server.com/something/test.css')
+
+    def test_external_url(self):
+        self._test_external_url('http://other.com/something/test.css', 'http://other.com/something/test.css')
+
+    def test_external_ssl_url(self):
+        self._test_external_url('https://other.com/something/test.css', 'https://other.com/something/test.css')
+
+    def test_external_schemeless_url(self):
+        self._test_external_url('//other.com/something/test.css', 'http://other.com/something/test.css')
+
+
 class CommaSelector(unittest.TestCase):
     def setUp(self):
         self.html = """<style>.b1,.b2 { font-weight:bold; } .c {color: red}</style><span class="b1">Bold</span><span class="b2 c">Bold Red</span>"""
