@@ -52,7 +52,7 @@ class Basic(unittest.TestCase):
         output = self.p.run()
         self.assertEqual(output, u'<h1 style="color: #f00">Hello World!</h1>')
 
-    def test_fromString(self):
+    def test_fromString_complete(self):
         """Test 'fromString' complete"""
         output = pynliner.fromString(self.html)
         desired = u'<h1 style="color: #fc0">Hello World!</h1>'
@@ -167,7 +167,7 @@ class CommaSelector(unittest.TestCase):
         output = self.p.run()
         self.assertEqual(output, u'<span class="b1" style="font-weight: bold; font-size: 2em">Bold</span><span class="b2 c" style="color: red; font-weight: bold; font-size: 2em">Bold Red</span>')
 
-    def test_fromString(self):
+    def test_fromString_complete(self):
         """Test 'fromString' complete"""
         output = pynliner.fromString(self.html)
         desired = u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-weight: bold">Bold Red</span>'
