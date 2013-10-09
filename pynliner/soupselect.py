@@ -73,8 +73,8 @@ def get_pseudo_class_checker(psuedo_class):
     that psuedo class
     """
     return {
-        'first-child': lambda el: is_first_content_node(el.previousSibling),
-        'last-child': lambda el: is_last_content_node(el.nextSibling)
+        'first-child': lambda el: is_first_content_node(getattr(el, 'previousSibling', None)),
+        'last-child': lambda el: is_last_content_node(getattr(el, 'nextSibling', None))
     }.get(psuedo_class)
 
 def get_checker(functions):
@@ -121,7 +121,7 @@ def select(soup, selector):
                 match = pseudo_class_regex.search(token)
                 if match:
                     checker_functions.append(get_pseudo_class_checker(match.groups(1)[0]))
-            
+
             checker = get_checker(checker_functions)
             #
             # Get tag

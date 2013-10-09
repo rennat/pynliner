@@ -375,6 +375,35 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
+    def test_multiple_pseudo_selectors(self):
+        html = """<h1><span>Hello World!</span></h1>"""
+        css = """span:first-child:last-child { color: red; }"""
+        expected = u"""<h1><span style="color: red">Hello World!</span></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+        html = """<h1><span>Hello World!</span><span>again!</span></h1>"""
+        css = """span:first-child:last-child { color: red; }"""
+        expected = u"""<h1><span>Hello World!</span><span>again!</span></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
+    def test_parent_pseudo_selector(self):
+        html = """<h1><span><span>Hello World!</span></span></h1>"""
+        css = """span:last-child span { color: red; }"""
+        expected = u"""<h1><span><span style="color: red">Hello World!</span></span></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+        html = """<h1><span><span>Hello World!</span></span></h1>"""
+        css = """span:last-child > span { color: red; }"""
+        expected = u"""<h1><span><span style="color: red">Hello World!</span></span></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+        html = """<h1><span><span>Hello World!</span></span><span>nope</span></h1>"""
+        css = """span:last-child > span { color: red; }"""
+        expected = u"""<h1><span><span>Hello World!</span></span><span>nope</span></h1>"""
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
     def test_child_follow_by_last_child_selector_complex_dom(self):
         html = """<h1><span>Hello World!</span><p>foo</p><div class="barclass"><span>baz</span>bar</div></h1>"""
         css = """h1 > :last-child { color: red; }"""
