@@ -33,6 +33,7 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 __version__ = "0.5.0"
 
 import re
+import urlparse
 import urllib2
 import cssutils
 from BeautifulSoup import BeautifulSoup, Comment
@@ -52,6 +53,8 @@ class Pynliner(object):
         cssutils.log.enabled = False if log is None else True
         self.extra_style_strings = []
         self.allow_conditional_comments = allow_conditional_comments
+        self.root_url = None
+        self.relative_url = None
 
     def from_url(self, url):
         """Gets remote HTML page for conversion
@@ -160,12 +163,11 @@ class Pynliner(object):
         link_tags = self.soup.findAll('link', {'rel': 'stylesheet'})
         for tag in link_tags:
             url = tag['href']
-            if url.startswith('http://'):
-                pass
-            elif url.startswith('/'):
-                url = self.root_url + url
-            else:
-                url = self.relative_url + url
+
+            # Convert the relative URL to an absolute URL ready to pass to urllib
+            base_url = self.relative_url or self.root_url
+            url = urlparse.urljoin(base_url, url)
+
             self.style_string += self._get_url(url)
             tag.extract()
 
