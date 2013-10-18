@@ -232,7 +232,8 @@ class Pynliner(object):
             # for each prop_list, apply to CSSStyleDeclaration
             for prop_list in map(lambda obj: obj['props'], props):
                 for prop in prop_list:
-                    elem_style_map[elem][prop.name] = prop.value
+                    elem_style_map[elem].removeProperty(prop.name)
+                    elem_style_map[elem].setProperty(prop.name, prop.value)
 
 
         # apply rules to elements
