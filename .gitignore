@@ -1,6 +1,7 @@
 .DS_Store
 *.pyc
 *.kpf
+*.egg
 *.egg-info
 .idea
 /docs/_build/html/*.zip

@@ -25,7 +25,7 @@ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
 EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR 
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
@@ -47,6 +47,11 @@ class Pynliner(object):
     style_string = False
     stylesheet = False
     output = False
+    attr_mappings = {
+        'width': 'width',
+        'height': 'height',
+        'background-color': 'bgcolor',
+    }
 
     def __init__(self, log=None, allow_conditional_comments=False):
         self.log = log
@@ -235,14 +240,24 @@ class Pynliner(object):
                     elem_style_map[elem].removeProperty(prop.name)
                     elem_style_map[elem].setProperty(prop.name, prop.value)
 
-
         # apply rules to elements
         for elem, style_declaration in elem_style_map.items():
+
+            # apply any styling that maps to attributes separatelly.
+            for property_name in style_declaration.keys():
+                if property_name in self.attr_mappings:
+                    attr_name = self.attr_mappings[property_name]
+                    attr_value = style_declaration.getPropertyCSSValue(property_name).cssText
+                    if attr_name == 'height' or attr_name == 'width':
+                        attr_value = attr_value.replace('px', '')
+                    elem[attr_name] = attr_value
+                    style_declaration.removeProperty(property_name)
+
             if elem.has_key('style'):
                 elem['style'] = u'%s; %s' % (style_declaration.cssText.replace('\n', ' '), elem['style'])
             else:
                 elem['style'] = style_declaration.cssText.replace('\n', ' ')
-        
+
     def _get_output(self):
         """Generate Unicode string of `self.soup` and set it to `self.output`
 
@@ -250,7 +265,7 @@ class Pynliner(object):
         """
         self.output = unicode(self.soup)
         return self.output
-    
+
     def _clean_output(self):
         """Clean up after BeautifulSoup's output.
         """
