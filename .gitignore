@@ -4,4 +4,5 @@
 *.egg
 *.egg-info
 .idea
+/dist
 /docs/_build/html/*.zip
