@@ -13,7 +13,7 @@ tests_require = [
 ] + install_requires
 
 setup(name='pynliner',
-      version='0.5.0',
+      version='0.5.1',
       description='Python CSS-to-inline-styles conversion tool for HTML using'
                   ' BeautifulSoup and cssutils',
       author='Tanner Netterville',
