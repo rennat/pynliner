@@ -3,6 +3,8 @@
 Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and
 cssutils
 
+[![Build Status](https://travis-ci.org/rennat/pynliner.png?branch=master)](https://travis-ci.org/rennat/pynliner)
+
 - [PyPI page](http://pypi.python.org/pypi/pynliner)
 - [PyPI documentation](http://pythonhosted.org/pynliner)
 - [GitHub project page](http://github.com/rennat/pynliner)
