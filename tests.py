@@ -276,6 +276,14 @@ class BeautifulSoupBugs(unittest.TestCase):
 
 
 class ComplexSelectors(unittest.TestCase):
+
+    def test_id_class_selector(self):
+        html = '<table id="content"><tr><td>hey</td></tr>'
+        css = """#content table.button-primary-wrapper td { background-color: #71cae3; }"""
+        expected = html
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
     def test_multiple_class_selector(self):
         html = """<h1 class="a b">Hello World!</h1>"""
         css = """h1.a.b { color: red; }"""
