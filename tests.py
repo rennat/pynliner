@@ -191,24 +191,24 @@ class CommaSelector(unittest.TestCase):
         self.p._get_soup()
         self.p._get_styles()
         self.p._apply_styles()
-        self.assertEqual(unicode(self.p.soup), u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-weight: bold">Bold Red</span>')
+        self.assertEqual(unicode(self.p.soup), u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="font-weight: bold; color: red">Bold Red</span>')
 
     def test_run(self):
         """Test 'run' method"""
         output = self.p.run()
-        self.assertEqual(output, u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-weight: bold">Bold Red</span>')
+        self.assertEqual(output, u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="font-weight: bold; color: red">Bold Red</span>')
 
     def test_with_cssString(self):
         """Test 'with_cssString' method"""
         cssString = '.b1,.b2 {font-size: 2em;}'
         self.p = Pynliner().from_string(self.html).with_cssString(cssString)
         output = self.p.run()
-        self.assertEqual(output, u'<span class="b1" style="font-weight: bold; font-size: 2em">Bold</span><span class="b2 c" style="color: red; font-weight: bold; font-size: 2em">Bold Red</span>')
+        self.assertEqual(output, u'<span class="b1" style="font-weight: bold; font-size: 2em">Bold</span><span class="b2 c" style="font-weight: bold; color: red; font-size: 2em">Bold Red</span>')
 
     def test_fromString_complete(self):
         """Test 'fromString' complete"""
         output = pynliner.fromString(self.html)
-        desired = u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="color: red; font-weight: bold">Bold Red</span>'
+        desired = u'<span class="b1" style="font-weight: bold">Bold</span><span class="b2 c" style="font-weight: bold; color: red">Bold Red</span>'
         self.assertEqual(output, desired)
 
     def test_comma_whitespace(self):
@@ -490,6 +490,13 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
+    def test_specificity(self):
+        html = """<div class="foo"></div>"""
+        css1 = """div,a,b,c,d,e,f,g,h,i,j { color: red; }"""
+        css2 = """.foo { color: blue; }"""
+        expected = u"""<div class="foo" style="color: blue"></div>"""
+        output = pynliner.Pynliner().from_string(html).with_cssString(css1).with_cssString(css2).run()
+        self.assertEqual(output, expected)
 
 if __name__ == '__main__':
     unittest.main()
