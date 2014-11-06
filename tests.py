@@ -218,6 +218,12 @@ class CommaSelector(unittest.TestCase):
         output = Pynliner().from_string(html).run()
         self.assertEqual(output, desired_output)
 
+    def test_comma_separated_nested_styles(self):
+        html = """<style>.orange-wrapper p, .super-orange-wrapper p { color:orange; }</style><div class="orange-wrapper"><p>Orange</p></div><div><p>Black</p></div>"""
+        desired_output = """<div class="orange-wrapper"><p style="color: orange">Orange</p></div><div><p>Black</p></div>"""
+        output = Pynliner().from_string(html).run()
+        self.assertEqual(output, desired_output)
+
 
 class Extended(unittest.TestCase):
     def test_overwrite(self):
