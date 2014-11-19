@@ -30,7 +30,7 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
 
-__version__ = "0.5.1"
+__version__ = "0.5.2"
 
 import re
 import urlparse
