@@ -116,6 +116,7 @@ class Pynliner(object):
         if not self.stylesheet:
             self._get_styles()
         self._apply_styles()
+        self._insert_media_rules()
         self._get_output()
         self._clean_output()
         return self.output
@@ -198,6 +199,19 @@ class Pynliner(object):
         For a given CSSRule get its selector specificity in base 10
         """
         return sum(map(self._get_specificity_from_list, (s.specificity for s in rule.selectorList)))
+
+    def _insert_media_rules(self):
+        """If there are any media rules, re-insert a style tag at the top and
+        dump them all in.
+        """
+        rules = list(self.stylesheet.cssRules.rulesOfType(cssutils.css.CSSRule.MEDIA_RULE))
+        if rules:
+            style = BeautifulSoup(
+                "<style>" + "\n".join(re.sub(r'\s+', ' ', x.cssText) for x in rules) +
+                "</style>",
+            )
+            target = self.soup.body or self.soup
+            target.insert(0, style)
 
     def _apply_styles(self):
         """Steps through CSS rules and applies each to all the proper elements
