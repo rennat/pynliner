@@ -241,6 +241,42 @@ class Extended(unittest.TestCase):
         self.assertEqual(output, desired_output)
 
 
+class MediaQuery(unittest.TestCase):
+    def setUp(self):
+        self.mq = '@media (min-width: 640px) { .infobox { float: right } }'
+
+    def test_leave_alone(self):
+        """Test media queries are 'left alone'"""
+        html = '<style>' + self.mq + '</style>'\
+               '<h1>Foo</h1><div class="infobox">Blah</div>'
+
+        desired_output = '<style>' + self.mq + '</style>'\
+            '<h1>Foo</h1><div class="infobox">Blah</div>'
+        output = Pynliner().from_string(html).run()
+        self.assertEqual(output, desired_output)
+
+    def test_mixed_styles(self):
+        """Test media queries do not affect regular operation"""
+        html = '<style>' + self.mq + ' h1 {color:#ffcc00;}</style>'\
+               '<h1>Foo</h1><div class="infobox">Blah</div>'
+
+        desired_output = '<style>' + self.mq + '</style>'\
+            '<h1 style="color: #fc0">Foo</h1><div class="infobox">Blah</div>'
+        output = Pynliner().from_string(html).run()
+        self.assertEqual(output, desired_output)
+
+    def test_real_html(self):
+        """Test re-inserted styles are placed in the body for HTML"""
+        html = '<html><head><style>' + self.mq + ' h1 {color:#ffcc00;}</style></head>'\
+               '<body><h1>Foo</h1><div class="infobox">Blah</div>'
+
+        desired_output = '<html><head></head><body><style>' + self.mq + '</style>'\
+            '<h1 style="color: #fc0">Foo</h1><div class="infobox">Blah</div>'\
+            '</body></html>'
+        output = Pynliner().from_string(html).run()
+        self.assertEqual(output, desired_output)
+
+
 class LogOptions(unittest.TestCase):
     def setUp(self):
         self.html = "<style>h1 { color:#ffcc00; }</style><h1>Hello World!</h1>"
