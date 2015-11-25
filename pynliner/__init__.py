@@ -30,14 +30,22 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
 
-__version__ = "0.5.2"
-
 import re
-import urlparse
-import urllib2
+
 import cssutils
-from BeautifulSoup import BeautifulSoup, Comment
-from soupselect import select
+from bs4 import BeautifulSoup
+
+from .soupselect import select
+
+try:
+    from urllib.parse import urljoin
+    from urllib.request import urlopen
+    unicode = str
+except ImportError:
+    from urlparse import urljoin
+    from urllib2 import urlopen
+
+__version__ = "0.5.2"
 
 
 class Pynliner(object):
@@ -118,13 +126,12 @@ class Pynliner(object):
         self._apply_styles()
         self._insert_media_rules()
         self._get_output()
-        self._clean_output()
         return self.output
 
     def _get_url(self, url):
         """Returns the response content from the given url
         """
-        return urllib2.urlopen(url).read()
+        return urlopen(url).read()
 
     def _get_soup(self):
         """Convert source string to BeautifulSoup object. Sets it to self.soup.
@@ -137,8 +144,8 @@ class Pynliner(object):
         try:
             from mod_wsgi import version
             self.soup = BeautifulSoup(self.source_string, "html5lib")
-        except:
-            self.soup = BeautifulSoup(self.source_string)
+        except ImportError:
+            self.soup = BeautifulSoup(self.source_string, "html.parser")
 
     def _get_styles(self):
         """Gets all CSS content from and removes all <link rel="stylesheet"> and
@@ -167,7 +174,7 @@ class Pynliner(object):
 
             # Convert the relative URL to an absolute URL ready to pass to urllib
             base_url = self.relative_url or self.root_url
-            url = urlparse.urljoin(base_url, url)
+            url = urljoin(base_url, url)
 
             self.style_string += self._get_url(url)
             tag.extract()
@@ -209,6 +216,7 @@ class Pynliner(object):
             style = BeautifulSoup(
                 "<style>" + "\n".join(re.sub(r'\s+', ' ', x.cssText) for x in rules) +
                 "</style>",
+                "html.parser"
             )
             target = self.soup.body or self.soup
             target.insert(0, style)
@@ -249,14 +257,13 @@ class Pynliner(object):
                     elem_style_map[elem].removeProperty(prop.name)
                     elem_style_map[elem].setProperty(prop.name, prop.value)
 
-
         # apply rules to elements
         for elem, style_declaration in elem_style_map.items():
-            if elem.has_key('style'):
+            if elem.has_attr('style'):
                 elem['style'] = u'%s; %s' % (style_declaration.cssText.replace('\n', ' '), elem['style'])
             else:
                 elem['style'] = style_declaration.cssText.replace('\n', ' ')
-        
+
     def _get_output(self):
         """Generate Unicode string of `self.soup` and set it to `self.output`
 
@@ -264,18 +271,6 @@ class Pynliner(object):
         """
         self.output = unicode(self.soup)
         return self.output
-    
-    def _clean_output(self):
-        """Clean up after BeautifulSoup's output.
-        """
-        if self.allow_conditional_comments:
-            matches = re.finditer('(<!--\[if .+\].+?&lt;!\[endif\]-->)', self.output)
-            for match in matches:
-                comment = match.group()
-                comment = comment.replace('&gt;', '>')
-                comment = comment.replace('&lt;', '<')
-                self.output = (self.output[:match.start()] + comment +
-                               self.output[match.end():])
 
 
 def fromURL(url, log=None):
@@ -286,6 +281,7 @@ def fromURL(url, log=None):
     Returns processed HTML string.
     """
     return Pynliner(log).from_url(url).run()
+
 
 def fromString(string, log=None):
     """Shortcut Pynliner constructor. Equivalent to:

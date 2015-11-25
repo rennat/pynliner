@@ -15,10 +15,14 @@ select(soup, 'div#main ul a')
 patched to support multiple class selectors here http://code.google.com/p/soupselect/issues/detail?id=4#c0
 """
 import re
-import BeautifulSoup
+import operator as operator_
+from functools import partial
+
+import bs4
 
 attribute_regex = re.compile('\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
-pseudo_class_regex = re.compile(ur':(([^:.#(*\[]|\([^)]+\))+)')
+pseudo_class_regex = re.compile(u':(([^:.#(*\\[]|\\([^)]+\\))+)')
+
 
 def get_attribute_checker(operator, attribute, value=''):
     """
@@ -38,14 +42,16 @@ def get_attribute_checker(operator, attribute, value=''):
         # attribute is either exactly value or starts with value-
         '|': lambda el: el.get(attribute, '') == value \
             or el.get(attribute, '').startswith('%s-' % value),
-    }.get(operator, lambda el: el.has_key(attribute))
+    }.get(operator, lambda el: el.has_attr(attribute))
+
 
 def is_white_space(el):
-    if isinstance(el, BeautifulSoup.NavigableString) and str(el).strip() == '':
+    if isinstance(el, bs4.NavigableString) and str(el).strip() == '':
         return True
-    if isinstance(el, BeautifulSoup.Comment):
+    if isinstance(el, bs4.Comment):
         return True
     return False
+
 
 def is_last_content_node(el):
     result = False
@@ -55,6 +61,7 @@ def is_last_content_node(el):
         result = is_last_content_node(el.nextSibling)
     return result
 
+
 def is_first_content_node(el):
     result = False
     if el is None:
@@ -62,6 +69,7 @@ def is_first_content_node(el):
     if is_white_space(el):
         result = is_first_content_node(el.previousSibling)
     return result
+
 
 def get_pseudo_class_checker(psuedo_class):
     """
@@ -73,6 +81,7 @@ def get_pseudo_class_checker(psuedo_class):
         'first-child': lambda el: is_first_content_node(getattr(el, 'previousSibling', None)),
         'last-child': lambda el: is_last_content_node(getattr(el, 'nextSibling', None))
     }.get(psuedo_class, lambda el: False)
+
 
 def get_checker(functions):
     def checker(el):
@@ -148,11 +157,11 @@ def select(soup, selector):
             if ids:
                 find_dict['id'] = ids
             if classes:
-                find_dict['class'] = lambda attr: attr and set(classes).issubset(attr.split())
+                find_dict['class'] = partial(operator_.contains, classes)
             if operator is None:
                 # This is the first token: simply find all matches
                 for context in current_context:
-                    context_matches = [el for el in context[0].findAll(tag, find_dict) if checker(el)]
+                    context_matches = [el for el in context[0].find_all(tag, find_dict) if checker(el)]
                     for context_match in context_matches:
                         found.append(
                             (context_match, [context_match]),
@@ -205,7 +214,6 @@ def select(soup, selector):
         else:
             # Get the next operator (whitespace, >, ~, +)
             handle_token = True
-            operator = None
             match = re.search('([>~+]+)$', selector)
             if match:
                 operator = match.groups(1)[0]
@@ -214,16 +222,18 @@ def select(soup, selector):
             selector = selector.rsplit(operator, 1)[0].rstrip()
     return [entry[0] for entry in current_context]
 
+
 def monkeypatch(BeautifulSoupClass=None):
     """
     If you don't explicitly state the class to patch, defaults to the most 
     common import location for BeautifulSoup.
     """
     if not BeautifulSoupClass:
-        from BeautifulSoup import BeautifulSoup as BeautifulSoupClass
+        from bs4 import BeautifulSoup as BeautifulSoupClass
     BeautifulSoupClass.findSelect = select
+
 
 def unmonkeypatch(BeautifulSoupClass=None):
     if not BeautifulSoupClass:
-        from BeautifulSoup import BeautifulSoup as BeautifulSoupClass
+        from bs4 import BeautifulSoup as BeautifulSoupClass
     delattr(BeautifulSoupClass, 'findSelect')
