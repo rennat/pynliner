@@ -192,21 +192,6 @@ class Pynliner(object):
             self.style_string += u'\n'.join(tag.contents) + u'\n'
             tag.extract()
 
-    def _get_specificity_from_list(self, lst):
-        """
-        Takes an array of ints and returns an integer formed
-        by adding all ints multiplied by the power of 10 of the current index
-
-        (1, 0, 0, 1) => (1 * 10**3) + (0 * 10**2) + (0 * 10**1) + (1 * 10**0) => 1001
-        """
-        return int(''.join(map(str, lst)))
-
-    def _get_rule_specificity(self, rule):
-        """
-        For a given CSSRule get its selector specificity in base 10
-        """
-        return sum(map(self._get_specificity_from_list, (s.specificity for s in rule.selectorList)))
-
     def _insert_media_rules(self):
         """If there are any media rules, re-insert a style tag at the top and
         dump them all in.
@@ -228,22 +213,16 @@ class Pynliner(object):
         rules = self.stylesheet.cssRules.rulesOfType(1)
         elem_prop_map = {}
         elem_style_map = {}
-
         # build up a property list for every styled element
         for rule in rules:
-            # select elements for every selector
-            selectors = rule.selectorText.split(',')
-            elements = []
-            for selector in selectors:
-                elements += select(self.soup, selector.strip())
-            # build prop_list for each selected element
-            for elem in elements:
-                if elem not in elem_prop_map:
-                    elem_prop_map[elem] = []
-                elem_prop_map[elem].append({
-                    'specificity': self._get_rule_specificity(rule),
-                    'props': rule.style.getProperties(),
-                })
+            for selector in rule.selectorList:
+                for element in select(self.soup, selector.selectorText):
+                    if element not in elem_prop_map:
+                        elem_prop_map[element] = []
+                    elem_prop_map[element].append({
+                        'specificity': selector.specificity,
+                        'props': rule.style.getProperties(),
+                    })
 
         # build up another property list using selector specificity
         for elem, props in elem_prop_map.items():
