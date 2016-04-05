@@ -3,6 +3,9 @@
 *.kpf
 *.egg
 *.egg-info
+.eggs
 .idea
+/build
+/venv
 /dist
 /docs/_build/html/*.zip

@@ -5,7 +5,7 @@
 Python CSS-to-inline-styles conversion tool for HTML using BeautifulSoup and
 cssutils
 
-Copyright (c) 2011-2013 Tanner Netterville
+Copyright (c) 2011-2016 Tanner Netterville
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
