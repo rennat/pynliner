@@ -324,6 +324,13 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
+    def test_missing_link_descendant_selector(self):
+        html = '<div id="a"><i>x</i></div>'
+        css = '#a b i { color: red }'
+        expected = html
+        output = Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(output, expected)
+
     def test_multiple_class_selector(self):
         html = """<h1 class="a b">Hello World!</h1>"""
         css = """h1.a.b { color: red; }"""

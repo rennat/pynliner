@@ -217,9 +217,9 @@ def select(soup, selector):
             match = re.search('([>~+]+)$', selector)
             if match:
                 operator = match.groups(1)[0]
+                selector = selector.rsplit(operator, 1)[0].rstrip()
             else:
                 operator = ' '
-            selector = selector.rsplit(operator, 1)[0].rstrip()
     return [entry[0] for entry in current_context]
 
 
