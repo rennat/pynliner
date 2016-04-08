@@ -45,7 +45,7 @@ except ImportError:
     from urlparse import urljoin
     from urllib2 import urlopen
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 
 class Pynliner(object):

@@ -48,6 +48,11 @@ methods
 changelog
 =========
 
+0.7.1
+-----
+
+- attribute selector bug ( https://github.com/rennat/pynliner/issues/42 )
+
 0.7.0
 -----
 
