@@ -20,8 +20,9 @@ from functools import partial
 
 import bs4
 
-attribute_regex = re.compile('\[(?P<attribute>[^\s\]=~\|\^\$\*]+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
-pseudo_class_regex = re.compile(u':(([^:.#(*\\[]|\\([^)]+\\))+)')
+ATTRIBUTE_PATTERN = re.compile(r'\[(?P<attribute>[^\s\]=~\|\^\$\*]+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
+PSEUDO_CLASS_PATTERN = re.compile(u':(([^:.#(*\\[]|\\([^)]+\\))+)')
+SELECTOR_TOKEN_PATTERN = re.compile(r'([_0-9a-zA-Z-#.:*]+|\[[^\]]+\])$')
 
 
 def get_attribute_checker(operator, attribute, value=''):
@@ -104,7 +105,7 @@ def select(soup, selector):
         if handle_token:
             # Get the rightmost token
             handle_token = False
-            match = re.search(r'([_0-9a-zA-Z-#.:*]+|\[[^\]]+\])$', selector)
+            match = SELECTOR_TOKEN_PATTERN.search(selector)
             if not match:
                 raise Exception("No match was found. We're done or something is broken")
             token = match.groups(1)[0]
@@ -116,14 +117,14 @@ def select(soup, selector):
             #
             # Get attribute selectors from token
             #
-            matches = attribute_regex.findall(token)
+            matches = ATTRIBUTE_PATTERN.findall(token)
             for match in matches:
                 checker_functions.append(get_attribute_checker(match[1], match[0], match[2]))
 
             #
             # Get pseudo classes from token
             #
-            for match in pseudo_class_regex.finditer(token):
+            for match in PSEUDO_CLASS_PATTERN.finditer(token):
                 checker_functions.append(get_pseudo_class_checker(match.groups(1)[0]))
 
             checker = get_checker(checker_functions)
