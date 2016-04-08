@@ -531,20 +531,6 @@ class ComplexSelectors(unittest.TestCase):
         output = Pynliner().from_string(html).with_cssString(css).run()
         self.assertEqual(output, expected)
 
-    def test_attribute_selector_match(self):
-        html = """<h1 title="foo">Hello World!</h1>"""
-        css = """h1[title="foo"] { color: red; }"""
-        expected = u'<h1 style="color: red" title="foo">Hello World!</h1>'
-        output = Pynliner().from_string(html).with_cssString(css).run()
-        self.assertEqual(output, expected)
-
-    def test_attribute_selector_no_match(self):
-        html = """<h1 title="bar">Hello World!</h1>"""
-        css = """h1[title="foo"] { color: red; }"""
-        expected = u"""<h1 title="bar">Hello World!</h1>"""
-        output = Pynliner().from_string(html).with_cssString(css).run()
-        self.assertEqual(output, expected)
-
     def test_specificity(self):
         html = """<div class="foo"></div>"""
         css1 = """div,a,b,c,d,e,f,g,h,i,j { color: red; }"""
@@ -552,6 +538,64 @@ class ComplexSelectors(unittest.TestCase):
         expected = u"""<div class="foo" style="color: blue"></div>"""
         output = pynliner.Pynliner().from_string(html).with_cssString(css1).with_cssString(css2).run()
         self.assertEqual(output, expected)
+
+
+class AttributeSelectorTestCase(unittest.TestCase):
+
+    def assert_pynlined(self, html, css, expected):
+        actual = pynliner.Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(actual, expected)
+
+    def test_exists(self):
+        html = '<span data-type="thing">1</span>'
+        css = '[data-type] {color: red;}'
+        expected = u'<span data-type="thing" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+
+    def test_equals(self):
+        html = '<span data-type="thing">1</span>'
+        css = '[data-type="thing"] {color: red;}'
+        expected = u'<span data-type="thing" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+        css = '[data-type = "thing"] {color: red;}'
+        self.assert_pynlined(html, css, expected)
+
+    def test_one_of(self):
+        html = '<span data-type="thing1 thing2">1</span>'
+        css = '[data-type~="thing1"] {color: red;}'
+        expected = u'<span data-type="thing1 thing2" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+        css = '[data-type~="thing2"] {color: red;}'
+        expected = u'<span data-type="thing1 thing2" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+
+    def test_starts_with(self):
+        html = '<span data-type="thing">1</span>'
+        css = '[data-type^="th"] {color: red;}'
+        expected = u'<span data-type="thing" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+
+    def test_ends_with(self):
+        html = '<span data-type="thing">1</span>'
+        css = '[data-type$="ng"] {color: red;}'
+        expected = u'<span data-type="thing" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+
+    def test_contains(self):
+        html = '<span data-type="thing">1</span>'
+        css = '[data-type*="i"] {color: red;}'
+        expected = u'<span data-type="thing" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+
+    def test_is_or_prefixed_by(self):
+        html = '<span data-type="thing">1</span>'
+        css = '[data-type|="thing"] {color: red;}'
+        expected = u'<span data-type="thing" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+        html = '<span data-type="thing-1">1</span>'
+        expected = u'<span data-type="thing-1" style="color: red">1</span>'
+        self.assert_pynlined(html, css, expected)
+
 
 if __name__ == '__main__':
     unittest.main()

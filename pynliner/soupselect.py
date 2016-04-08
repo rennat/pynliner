@@ -20,7 +20,7 @@ from functools import partial
 
 import bs4
 
-attribute_regex = re.compile('\[(?P<attribute>\w+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
+attribute_regex = re.compile('\[(?P<attribute>[^\s\]=~\|\^\$\*]+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
 pseudo_class_regex = re.compile(u':(([^:.#(*\\[]|\\([^)]+\\))+)')
 
 
@@ -104,7 +104,7 @@ def select(soup, selector):
         if handle_token:
             # Get the rightmost token
             handle_token = False
-            match = re.search('([_0-9a-zA-Z-#.:*"\'\[\\]=]+)$', selector)
+            match = re.search(r'([_0-9a-zA-Z-#.:*]+|\[[^\]]+\])$', selector)
             if not match:
                 raise Exception("No match was found. We're done or something is broken")
             token = match.groups(1)[0]
