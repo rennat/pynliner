@@ -49,10 +49,10 @@ __version__ = "0.7.1"
 
 
 # this pattern may be too aggressive
-HTML_ENTITY_PATTERN = ur'&(#([0-9]+|x[a-fA-F0-9]+)|[a-zA-Z][^\s;]+);'
+HTML_ENTITY_PATTERN = re.compile(r'&(#([0-9]+|x[a-fA-F0-9]+)|[a-zA-Z][^\s;]+);')
 
-SUBSTITUTION_FORMAT = u'[pynlinerSubstitute:{}]'
-SUBSTITUTION_PATTERN = ur'\[pynlinerSubstitute:(\d+)\]'
+SUBSTITUTION_FORMAT = '[pynlinerSubstitute:{}]'
+SUBSTITUTION_PATTERN = re.compile(r'\[pynlinerSubstitute:(\d+)\]')
 
 
 class Pynliner(object):
