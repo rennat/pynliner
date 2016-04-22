@@ -51,7 +51,7 @@ __version__ = "0.7.1"
 # this pattern may be too aggressive
 HTML_ENTITY_PATTERN = re.compile(r'&(#([0-9]+|x[a-fA-F0-9]+)|[a-zA-Z][^\s;]+);')
 
-SUBSTITUTION_FORMAT = '[pynlinerSubstitute:{}]'
+SUBSTITUTION_FORMAT = '[pynlinerSubstitute:{0}]'
 SUBSTITUTION_PATTERN = re.compile(r'\[pynlinerSubstitute:(\d+)\]')
 
 
