@@ -31,6 +31,8 @@ THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 import re
+import bs4
+import uuid
 
 import cssutils
 from bs4 import BeautifulSoup
@@ -46,6 +48,28 @@ except ImportError:
     from urllib2 import urlopen
 
 __version__ = "0.7.1"
+
+
+class UniqueElement(object):
+    def __init__(self, element):
+        self.element = element
+
+    def __hash__(self):
+        return id(self.element)
+
+    def __repr__(self):
+        return self.element.__repr__()
+
+    def __eq__(self, other):
+        return id(self.element) == id(other.element)
+
+    @staticmethod
+    def wrap_element(element):
+        return UniqueElement(element)
+
+    @staticmethod
+    def unwrap_element(element):
+        return element.element
 
 
 class Pynliner(object):
@@ -217,6 +241,7 @@ class Pynliner(object):
         for rule in rules:
             for selector in rule.selectorList:
                 for element in select(self.soup, selector.selectorText):
+                    element = UniqueElement.wrap_element(element)
                     if element not in elem_prop_map:
                         elem_prop_map[element] = []
                     elem_prop_map[element].append({
@@ -238,6 +263,7 @@ class Pynliner(object):
 
         # apply rules to elements
         for elem, style_declaration in elem_style_map.items():
+            elem = UniqueElement.unwrap_element(elem)
             if elem.has_attr('style'):
                 elem['style'] = u'%s; %s' % (style_declaration.cssText.replace('\n', ' '), elem['style'])
             else:
