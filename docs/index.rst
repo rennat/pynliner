@@ -48,6 +48,12 @@ methods
 changelog
 =========
 
+0.7.2
+-----
+
+- fix duplicate element bug ( https://github.com/rennat/pynliner/issues/49 ) ( via https://github.com/rennat/pynliner/pull/51 )
+- preserve HTML entities through BeautifulSoup ( https://github.com/rennat/pynliner/issues/43 )
+
 0.7.1
 -----
 

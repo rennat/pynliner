@@ -45,7 +45,7 @@ except ImportError:
     from urlparse import urljoin
     from urllib2 import urlopen
 
-__version__ = "0.7.1"
+__version__ = "0.7.2"
 
 
 # this pattern may be too aggressive
