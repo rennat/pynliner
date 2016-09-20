@@ -618,5 +618,22 @@ class AttributeSelectorTestCase(unittest.TestCase):
         self.assert_pynlined(html, css, expected)
 
 
+class IdenticalElementStringTest(unittest.TestCase):
+    def test_identical_element(self):
+        css = """
+        .text-right {
+            text-align: right;
+        }
+        .box {
+            width:200px;
+            border: 1px solid #000;
+        }
+        """
+        html = """<div class="box"><p>Hello World</p><p class="text-right">Hello World on right</p><p class="text-right">Hello World on right</p></div>"""
+        expected = """<div class="box" style="width: 200px; border: 1px solid #000"><p>Hello World</p><p class="text-right" style="text-align: right">Hello World on right</p><p class="text-right" style="text-align: right">Hello World on right</p></div>"""
+        output = pynliner.Pynliner().from_string(html).with_cssString(css).run()
+        self.assertEqual(expected, output)
+
+
 if __name__ == '__main__':
     unittest.main()
