@@ -84,6 +84,14 @@ def get_pseudo_class_checker(psuedo_class):
     }.get(psuedo_class, lambda el: False)
 
 
+def contains_all_classes_checker(required_classes, el):
+    if not el:
+        return False
+    actual_classes = el.get('class', [])
+    test_has_class = partial(operator_.contains, actual_classes)
+    return all(map(test_has_class, required_classes))
+
+
 def get_checker(functions):
     def checker(el):
         for func in functions:
@@ -149,6 +157,7 @@ def select(soup, selector):
             # Get classes
             #
             classes = re.findall('\.([a-zA-Z0-9_-]+)', token)
+            checker_functions.append(partial(contains_all_classes_checker, classes))
 
             #
             # Search contexts for matches
