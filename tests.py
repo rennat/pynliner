@@ -315,6 +315,27 @@ class BeautifulSoupBugs(unittest.TestCase):
         self.assertTrue("<!--<!--" not in output)
 
 
+class Entities(unittest.TestCase):
+
+    def test_html_entities_preserved_by_default(self):
+        html = u'<p>&nbsp;</p>'
+        output = pynliner.fromString(html)
+        expected = html
+        self.assertEqual(expected, output)
+
+    def test_html_entities_preserved_explicitly(self):
+        html = u'<p>&nbsp;</p>'
+        output = pynliner.fromString(html, preserve_entities=True)
+        expected = html
+        self.assertEqual(expected, output)
+
+    def test_html_entities_unpreserved_explicitly(self):
+        html = u'<p>&nbsp;</p>'
+        output = pynliner.fromString(html, preserve_entities=False)
+        expected = u'<p>\xa0</p>'
+        self.assertEqual(expected, output)
+
+
 class ComplexSelectors(unittest.TestCase):
 
     def test_comma_specificity(self):

@@ -48,6 +48,13 @@ except ImportError:
 __version__ = "0.7.1"
 
 
+# this pattern may be too aggressive
+HTML_ENTITY_PATTERN = re.compile(r'&(#([0-9]+|x[a-fA-F0-9]+)|[a-zA-Z][^\s;]+);')
+
+SUBSTITUTION_FORMAT = '[pynlinerSubstitute:{0}]'
+SUBSTITUTION_PATTERN = re.compile(r'\[pynlinerSubstitute:(\d+)\]')
+
+
 class Pynliner(object):
     """Pynliner class"""
 
@@ -56,13 +63,16 @@ class Pynliner(object):
     stylesheet = False
     output = False
 
-    def __init__(self, log=None, allow_conditional_comments=False):
+    def __init__(self, log=None, allow_conditional_comments=False,
+                 preserve_entities=True):
         self.log = log
         cssutils.log.enabled = False if log is None else True
         self.extra_style_strings = []
         self.allow_conditional_comments = allow_conditional_comments
+        self.preserve_entities = preserve_entities
         self.root_url = None
         self.relative_url = None
+        self._substitutions = None
 
     def from_url(self, url):
         """Gets remote HTML page for conversion
@@ -119,6 +129,9 @@ class Pynliner(object):
         >>> Pynliner().from_string(html).run()
         u'<h1 style="color: #fc0">Hello World!</h1>'
         """
+        self._substitutions = []
+        if self.preserve_entities:
+            self._substitute_entities()
         if not self.soup:
             self._get_soup()
         if not self.stylesheet:
@@ -126,12 +139,42 @@ class Pynliner(object):
         self._apply_styles()
         self._insert_media_rules()
         self._get_output()
+        self._unsubstitute_output()
         return self.output
+
+    def _store_substitute(self, value):
+        """
+        store a string and return it's substitute
+        """
+        index = len(self._substitutions)
+        self._substitutions.append(value)
+        return SUBSTITUTION_FORMAT.format(index)
 
     def _get_url(self, url):
         """Returns the response content from the given url
         """
         return urlopen(url).read()
+
+    def _substitute_entities(self):
+        """
+        Add HTML entities to the substitutions list and replace with
+        placeholders in HTML source
+        """
+        self.source_string = re.sub(
+            HTML_ENTITY_PATTERN,
+            lambda m: self._store_substitute(m.group(0)),
+            self.source_string
+        )
+
+    def _unsubstitute_output(self):
+        """
+        Put substitutions back into the output
+        """
+        self.output = re.sub(
+            SUBSTITUTION_PATTERN,
+            lambda m: self._substitutions[int(m.group(1))],
+            self.output
+        )
 
     def _get_soup(self):
         """Convert source string to BeautifulSoup object. Sets it to self.soup.
@@ -252,21 +295,21 @@ class Pynliner(object):
         return self.output
 
 
-def fromURL(url, log=None):
+def fromURL(url, **kwargs):
     """Shortcut Pynliner constructor. Equivalent to:
 
     >>> Pynliner().from_url(someURL).run()
 
     Returns processed HTML string.
     """
-    return Pynliner(log).from_url(url).run()
+    return Pynliner(**kwargs).from_url(url).run()
 
 
-def fromString(string, log=None):
+def fromString(string, **kwargs):
     """Shortcut Pynliner constructor. Equivalent to:
 
     >>> Pynliner().from_string(someString).run()
 
     Returns processed HTML string.
     """
-    return Pynliner(log).from_string(string).run()
+    return Pynliner(**kwargs).from_string(string).run()
