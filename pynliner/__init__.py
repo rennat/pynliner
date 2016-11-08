@@ -153,7 +153,7 @@ class Pynliner(object):
     def _get_url(self, url):
         """Returns the response content from the given url
         """
-        return urlopen(url).read()
+        return urlopen(url).read().decode()
 
     def _substitute_entities(self):
         """
