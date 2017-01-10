@@ -8,4 +8,4 @@
 /build
 /venv
 /dist
-/docs/_build/html/*.zip
+/docs/html

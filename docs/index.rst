@@ -48,6 +48,12 @@ methods
 changelog
 =========
 
+0.8.0
+-----
+
+- fix multiclass selector bug ( https://github.com/rennat/pynliner/pull/52 )
+- fix python 3 compatability ( https://github.com/rennat/pynliner/pull/55 )
+
 0.7.2
 -----
 
