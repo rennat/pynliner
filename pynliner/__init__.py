@@ -219,7 +219,7 @@ class Pynliner(object):
             base_url = self.relative_url or self.root_url
             url = urljoin(base_url, url)
 
-            self.style_string += self._get_url(url)
+            self.style_string += self._get_url(url).decode('utf-8')
             tag.extract()
 
     def _get_internal_styles(self):
