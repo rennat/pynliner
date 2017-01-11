@@ -248,7 +248,31 @@ class Pynliner(object):
             )
             target = self.soup.body or self.soup
             target.insert(0, style)
+            
+    def _parse_styles(self, styles_str):
+        styles = {}
+        if styles_str:
+            for item in styles_str.split(";"):
+                item = item.split(":", 1)
+                if len(item) == 2:
+                    styles[item[0].lower()] = item[1] 
+        return styles
+    
+    def _reconstruct_styles(self, styles):
+        styles_str = ""
+        if styles:
+            for k, v in styles.items():
+                styles_str += '{0}: {1}; '.format(k, v)
+        return styles_str
 
+    def _substitute_styles(self, styles, new_styles):
+        # Convert existing styles to dicts
+        styles = self._parse_styles(styles)
+        new_styles = self._parse_styles(new_styles)
+        # Merge the two dicts. NB inline styles should override the class styles
+        new_styles.update(styles)
+        return self._reconstruct_styles(new_styles)
+        
     def _apply_styles(self):
         """Steps through CSS rules and applies each to all the proper elements
         as @style attributes prepending any current @style attributes.
@@ -285,7 +309,7 @@ class Pynliner(object):
         for elem_tuple, style_declaration in elem_style_map.items():
             elem, elem_id = elem_tuple
             if elem.has_attr('style'):
-                elem['style'] = u'%s; %s' % (style_declaration.cssText.replace('\n', ' '), elem['style'])
+                elem['style'] = self._substitute_styles(elem['style'], style_declaration.cssText.replace('\n', ' '))
             else:
                 elem['style'] = style_declaration.cssText.replace('\n', ' ')
 
