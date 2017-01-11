@@ -20,6 +20,9 @@ from functools import partial
 
 import bs4
 
+class SelectorNotSupportedException(Exception):
+    pass
+
 ATTRIBUTE_PATTERN = re.compile(r'\[(?P<attribute>[^\s\]=~\|\^\$\*]+)(?P<operator>[=~\|\^\$\*]?)=?["\']?(?P<value>[^\]"]*)["\']?\]')
 PSEUDO_CLASS_PATTERN = re.compile(u':(([^:.#(*\\[]|\\([^)]+\\))+)')
 SELECTOR_TOKEN_PATTERN = re.compile(r'([_0-9a-zA-Z-#.:*]+|\[[^\]]+\])$')
@@ -47,7 +50,7 @@ def get_attribute_checker(operator, attribute, value=''):
 
 
 def is_white_space(el):
-    if isinstance(el, bs4.NavigableString) and str(el).strip() == '':
+    if isinstance(el, bs4.NavigableString) and unicode(el).strip() == '':
         return True
     if isinstance(el, bs4.Comment):
         return True
@@ -115,7 +118,7 @@ def select(soup, selector):
             handle_token = False
             match = SELECTOR_TOKEN_PATTERN.search(selector)
             if not match:
-                raise Exception("No match was found. We're done or something is broken")
+                raise SelectorNotSupportedException
             token = match.groups(1)[0]
 
             # remove this token from the selector

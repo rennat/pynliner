@@ -36,6 +36,7 @@ import cssutils
 from bs4 import BeautifulSoup
 
 from .soupselect import select
+from .soupselect import SelectorNotSupportedException
 
 try:
     from urllib.parse import urljoin
@@ -64,12 +65,13 @@ class Pynliner(object):
     output = False
 
     def __init__(self, log=None, allow_conditional_comments=False,
-                 preserve_entities=True):
+                 preserve_entities=True, ignore_unsupported_selectors=False):
         self.log = log
         cssutils.log.enabled = False if log is None else True
         self.extra_style_strings = []
         self.allow_conditional_comments = allow_conditional_comments
         self.preserve_entities = preserve_entities
+        self.ignore_unsupported_selectors = ignore_unsupported_selectors
         self.root_url = None
         self.relative_url = None
         self._substitutions = None
@@ -259,14 +261,20 @@ class Pynliner(object):
         # build up a property list for every styled element
         for rule in rules:
             for selector in rule.selectorList:
-                for element in select(self.soup, selector.selectorText):
-                    element_tuple = (element, id(element))
-                    if element_tuple not in elem_prop_map:
-                        elem_prop_map[element_tuple] = []
-                    elem_prop_map[element_tuple].append({
-                        'specificity': selector.specificity,
-                        'props': rule.style.getProperties(),
-                    })
+                try:
+                    for element in select(self.soup, selector.selectorText):
+                        element_tuple = (element, id(element))
+                        if element_tuple not in elem_prop_map:
+                            elem_prop_map[element_tuple] = []
+                        elem_prop_map[element_tuple].append({
+                            'specificity': selector.specificity,
+                            'props': rule.style.getProperties(),
+                        })
+                except SelectorNotSupportedException ex:
+                    if self.ignore_unsupported_selectors:
+                        pass
+                    else:
+                        raise
 
         # build up another property list using selector specificity
         for elem_tuple, props in elem_prop_map.items():
