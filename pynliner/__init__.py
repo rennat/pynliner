@@ -259,7 +259,11 @@ class Pynliner(object):
         # build up a property list for every styled element
         for rule in rules:
             for selector in rule.selectorList:
-                for element in select(self.soup, selector.selectorText):
+                try:
+                    elements = select(self.soup, selector.selectorText)
+                except:
+                    pass
+                for element in elements:
                     element_tuple = (element, id(element))
                     if element_tuple not in elem_prop_map:
                         elem_prop_map[element_tuple] = []
