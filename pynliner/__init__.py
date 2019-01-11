@@ -170,11 +170,12 @@ class Pynliner(object):
         """
         Put substitutions back into the output
         """
-        self.output = re.sub(
-            SUBSTITUTION_PATTERN,
-            lambda m: self._substitutions[int(m.group(1))],
-            self.output
-        )
+        if self._substitutions:
+            self.output = re.sub(
+                SUBSTITUTION_PATTERN,
+                lambda m: self._substitutions[int(m.group(1))],
+                self.output
+            )
 
     def _get_soup(self):
         """Convert source string to BeautifulSoup object. Sets it to self.soup.
