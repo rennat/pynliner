@@ -64,7 +64,7 @@ class Pynliner(object):
     output = False
 
     def __init__(self, log=None, allow_conditional_comments=False,
-                 preserve_entities=True):
+                 preserve_entities=True, is_xml=False):
         self.log = log
         cssutils.log.enabled = False if log is None else True
         self.extra_style_strings = []
@@ -73,6 +73,7 @@ class Pynliner(object):
         self.root_url = None
         self.relative_url = None
         self._substitutions = None
+        self.is_xml = is_xml
 
     def from_url(self, url):
         """Gets remote HTML page for conversion
@@ -179,9 +180,14 @@ class Pynliner(object):
     def _get_soup(self):
         """Convert source string to BeautifulSoup object. Sets it to self.soup.
 
+        If parsing xml (i.e. self.is_xml = True), then use xml parser.
+
         If using mod_wgsi, use html5 parsing to prevent BeautifulSoup
         incompatibility.
         """
+        if self.is_xml:
+            self.soup = BeautifulSoup(self.source_string.encode('utf-8'), "xml")
+            return 
         # Check if mod_wsgi is running
         # - see http://code.google.com/p/modwsgi/wiki/TipsAndTricks
         try:
