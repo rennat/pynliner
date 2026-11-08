@@ -59,7 +59,7 @@ def is_last_content_node(el):
     if el is None:
         result = True
     elif is_white_space(el):
-        result = is_last_content_node(el.nextSibling)
+        result = is_last_content_node(el.next_sibling)
     return result
 
 
@@ -68,7 +68,7 @@ def is_first_content_node(el):
     if el is None:
         result = True
     if is_white_space(el):
-        result = is_first_content_node(el.previousSibling)
+        result = is_first_content_node(el.previous_sibling)
     return result
 
 
@@ -79,8 +79,8 @@ def get_pseudo_class_checker(psuedo_class):
     that psuedo class
     """
     return {
-        'first-child': lambda el: is_first_content_node(getattr(el, 'previousSibling', None)),
-        'last-child': lambda el: is_last_content_node(getattr(el, 'nextSibling', None))
+        'first-child': lambda el: is_first_content_node(getattr(el, 'previous_sibling', None)),
+        'last-child': lambda el: is_last_content_node(getattr(el, 'next_sibling', None))
     }.get(psuedo_class, lambda el: False)
 
 
@@ -156,7 +156,7 @@ def select(soup, selector):
             #
             # Get classes
             #
-            classes = re.findall('\.([a-zA-Z0-9_-]+)', token)
+            classes = re.findall(r'\.([a-zA-Z0-9_-]+)', token)
             checker_functions.append(partial(contains_all_classes_checker, classes))
 
             #
@@ -184,7 +184,7 @@ def select(soup, selector):
                 for context in current_context:
                     context_matches = []
                     for el in context[1]:
-                        if checker(el.findParent(tag, find_dict)):
+                        if checker(el.find_parent(tag, find_dict)):
                             context_matches.append(el)
                     if context_matches:
                         found.append(
@@ -197,7 +197,7 @@ def select(soup, selector):
                 for context in current_context:
                     context_matches = []
                     for el in context[1]:
-                        if checker(el.findParent(tag, find_dict)) == el.parent:
+                        if checker(el.find_parent(tag, find_dict)) == el.parent:
                             context_matches.append(el.parent)
                     if context_matches:
                         found.append(
@@ -214,8 +214,8 @@ def select(soup, selector):
                 for context in current_context:
                     context_matches = []
                     for el in context[1]:
-                        if checker(el.findPreviousSibling(tag, find_dict)) == el.previousSibling:
-                            context_matches.append(el.previousSibling)
+                        if checker(el.find_previous_sibling(tag, find_dict)) == el.previous_sibling:
+                            context_matches.append(el.previous_sibling)
                     if context_matches:
                         found.append(
                             (context[0], context_matches)

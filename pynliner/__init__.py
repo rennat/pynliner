@@ -211,7 +211,7 @@ class Pynliner(object):
         else:
             self.style_string += u'\n'
 
-        link_tags = self.soup.findAll('link', {'rel': 'stylesheet'})
+        link_tags = self.soup.find_all('link', {'rel': 'stylesheet'})
         for tag in link_tags:
             url = tag['href']
 
@@ -230,7 +230,7 @@ class Pynliner(object):
         else:
             self.style_string += u'\n'
 
-        style_tags = self.soup.findAll('style')
+        style_tags = self.soup.find_all('style')
         for tag in style_tags:
             self.style_string += u'\n'.join(tag.contents) + u'\n'
             tag.extract()
